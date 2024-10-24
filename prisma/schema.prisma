@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Picture {
+  id    String     @default(uuid()) @id
+  picture Bytes?
+  type    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  news Content[]
+  collage Collage[]
+}
+
+model Content {
+  id    String     @default(uuid()) @id
+  number      Int        @default(autoincrement())
+  title     String? @db.VarChar(500)
+  subtitle     String? @db.VarChar(500)
+  time String?
+  video String?
+  type    ContentType?
+  status    ContentSatus?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  contentItem ContentItem[]
+}
+
+model ContentItem {
+  id          String     @default(uuid()) @id
+  text        String?    @db.VarChar(3000)
+  picture     Picture?   @relation(fields: [pictureId], references: [id], onDelete: Cascade)
+  pictureId   String?    @default(uuid())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  content     Content?   @relation(fields: [contentIdId], references: [id], onDelete: Cascade)
+  contentIdId String?    @default(uuid())
+  list        Json?
+}
+
+model Portfolio {
+  id    String     @default(uuid()) @id
+  title     String? @db.VarChar(500)
+  description   String? @db.VarChar(3000)
+  category  String?
+  picture    Picture?    @relation(fields: [pictureId], references: [id], onDelete: Cascade)
+  pictureId  String? @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ContentType {
+  NEWS
+  ARTICLE
+}
+
+enum ContentSatus {
+  PUBLISHED
+  DRAFT
+  ARCHIVE
+}
