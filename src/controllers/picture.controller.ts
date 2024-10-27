@@ -8,7 +8,7 @@ import {
     HttpStatus,
   } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { PictureService } from 'src/services/picrute.service';
+import { PictureService } from '../services/picrute.service';
 import { Readable } from 'stream';
   
   @ApiTags('Picture')

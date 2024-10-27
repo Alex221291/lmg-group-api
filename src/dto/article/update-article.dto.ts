@@ -1,7 +1,7 @@
 import { $Enums } from '@prisma/client';
-import { ItemDto } from './create-news.dto';
+import { ItemDto } from '../news/create-news.dto';
 
-export interface UpdateNewsDto {
+export interface UpdateArticleDto {
     id: string;
     number: string;
     title?: string;

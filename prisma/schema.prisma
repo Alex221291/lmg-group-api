@@ -16,53 +16,91 @@ datasource db {
 model Picture {
   id    String     @default(uuid()) @id
   picture Bytes?
+  name String? @db.VarChar(500)
   type    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  news Content[]
-  collage Collage[]
+  newsItem NewsItem[]
+  articleItem ArticleItem[]
+  portfolio Portfolio[]
+  @@map("pictures")
 }
 
-model Content {
+model News {
   id    String     @default(uuid()) @id
   number      Int        @default(autoincrement())
   title     String? @db.VarChar(500)
   subtitle     String? @db.VarChar(500)
   time String?
   video String?
-  type    ContentType?
   status    ContentSatus?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  contentItem ContentItem[]
+  newsItem NewsItem[]
+  @@map("news")
 }
 
-model ContentItem {
+model Article {
+  id    String     @default(uuid()) @id
+  number      Int        @default(autoincrement())
+  title     String? @db.VarChar(500)
+  subtitle     String? @db.VarChar(500)
+  time String?
+  video String?
+  status    ContentSatus?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  articleItem ArticleItem[]
+  @@map("articles")
+}
+
+model NewsItem {
   id          String     @default(uuid()) @id
   text        String?    @db.VarChar(3000)
   picture     Picture?   @relation(fields: [pictureId], references: [id], onDelete: Cascade)
   pictureId   String?    @default(uuid())
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  content     Content?   @relation(fields: [contentIdId], references: [id], onDelete: Cascade)
-  contentIdId String?    @default(uuid())
+  news     News?   @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  newsId String?    @default(uuid())
   list        Json?
+  @@map("news_items")
+}
+
+model ArticleItem {
+  id          String     @default(uuid()) @id
+  text        String?    @db.VarChar(3000)
+  picture     Picture?   @relation(fields: [pictureId], references: [id], onDelete: Cascade)
+  pictureId   String?    @default(uuid())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  article     Article?   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId String?    @default(uuid())
+  list        Json?
+  @@map("article_items")
 }
 
 model Portfolio {
   id    String     @default(uuid()) @id
   title     String? @db.VarChar(500)
   description   String? @db.VarChar(3000)
-  category  String?
+  category    PortfolioCategory?    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId  String? @default(uuid())
   picture    Picture?    @relation(fields: [pictureId], references: [id], onDelete: Cascade)
   pictureId  String? @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@map("portfolios")
 }
 
-enum ContentType {
-  NEWS
-  ARTICLE
+model PortfolioCategory {
+  id    String     @default(uuid()) @id
+  title     String? @db.VarChar(500)
+  description   String? @db.VarChar(3000)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  portfolio Portfolio[]
+  @@map("portfolio_categories")
 }
 
 enum ContentSatus {

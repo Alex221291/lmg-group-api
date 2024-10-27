@@ -1,23 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
-import { GetNewsDto } from '../dto/news/get-news.dto';
-import { $Enums, News, Picture } from '@prisma/client';
-import { CreateNewsDto } from '../dto/news/create-news.dto';
+import { $Enums, Picture } from '@prisma/client';
 import { createReadStream } from 'fs';
 import { FileService } from './file.service';
-import { UpdateNewsDto } from '../dto/news/update-news.dto';
-import { UpdateNewsStatusDto } from 'src/dto/news/update-news-status.dto';
+import { GetArticleDto } from 'src/dto/article/get-article.dto';
+import { CreateArticleDto } from 'src/dto/article/create-article.dto';
+import { UpdateArticleDto } from 'src/dto/article/update-article.dto';
+import { UpdateArticleStatusDto } from 'src/dto/article/update-article-status.dto';
 @Injectable()
-export class NewsService {
+export class ArticleService {
   constructor(private prisma: PrismaService, 
     private fileService: FileService
   ) {}
 
-  async getById(id: string): Promise<GetNewsDto | null> {
-    const answer = await this.prisma.news.findUnique({
+  async getById(id: string): Promise<GetArticleDto | null> {
+    const answer = await this.prisma.article.findUnique({
       where: { id },
       include: {
-        newsItem: {
+        articleItem: {
           orderBy: {
             createdAt: 'asc',
           }
@@ -27,7 +27,7 @@ export class NewsService {
 
     if (!answer) return null;
 
-    const getNewsDto: GetNewsDto = {
+    const getArticleDto: GetArticleDto = {
       id: answer.id,
       number: answer.number,
       title: answer.title,
@@ -37,23 +37,23 @@ export class NewsService {
       createdAt: answer.createdAt,
       updatedAt: answer.updatedAt,
       status: answer.status,
-      contentItems: answer.newsItem.map((item) => ({
+      contentItems: answer.articleItem.map((item) => ({
         text: item.text,
         pictureId: item.pictureId,
         list: item.list ? JSON.parse(item.list as unknown as string) : undefined,
       })),
     };
 
-    return getNewsDto;
+    return getArticleDto;
   }
 
-  async getAll(): Promise<GetNewsDto[]> {
-    const news =  await this.prisma.news.findMany({
+  async getAll(): Promise<GetArticleDto[]> {
+    const article =  await this.prisma.article.findMany({
       orderBy: {
         number: 'asc',
       },
       include: {
-        newsItem: {
+        articleItem: {
           orderBy: {
             createdAt: 'asc',
           }
@@ -61,7 +61,7 @@ export class NewsService {
       },
     });
 
-    return news?.map(item => {
+    return article?.map(item => {
       return  {
         id: item.id,
         number: item.number,
@@ -72,7 +72,7 @@ export class NewsService {
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
         status: item.status,
-        newsItems: item.newsItem.map((item) => ({
+        articleItems: item.articleItem.map((item) => ({
           text: item.text,
           pictureId: item.pictureId,
           list: item.list ? JSON.parse(item.list as unknown as string) : undefined,
@@ -81,9 +81,9 @@ export class NewsService {
     })
   }
 
-  async createNews(filesInfo?: {path: string, name: string, type: string}[], data?: CreateNewsDto): Promise<GetNewsDto> {
+  async createArticle(filesInfo?: {path: string, name: string, type: string}[], data?: CreateArticleDto): Promise<GetArticleDto> {
 
-    const news = await this.prisma.news.create({
+    const article = await this.prisma.article.create({
       data: {
         title: data?.title,
         subtitle: data?.subtitle,
@@ -93,7 +93,7 @@ export class NewsService {
       },
     });
 
-    if(!data?.contentItems) return await this.getById(news.id);
+    if(!data?.contentItems) return await this.getById(article.id);
 
     for (const item of data?.contentItems) {
       let picture: Picture;
@@ -121,25 +121,25 @@ export class NewsService {
           await this.fileService.deleteFile(file?.path);
         }
       }
-      await this.prisma.newsItem.create({
+      await this.prisma.articleItem.create({
         data: {
-          newsId: news?.id,
+          articleId: article?.id,
           text: item?.text,
           pictureId: picture?.id || null,
           list: item?.list ? JSON.stringify(item.list) : undefined,
         }});
     }
     
-    return await this.getById(news.id);
+    return await this.getById(article.id);
   }
 
-  async updateNews(filesInfo?: {path: string, name: string, type: string}[], data?: UpdateNewsDto): Promise<GetNewsDto> {
+  async updateArticle(filesInfo?: {path: string, name: string, type: string}[], data?: UpdateArticleDto): Promise<GetArticleDto> {
 
-    const currentNews = await this.getById(data?.id);
-    if(!currentNews) return null;
+    const currentArticle = await this.getById(data?.id);
+    if(!currentArticle) return null;
     console.log(filesInfo[0]);
     console.log(data);
-    const updateNews = await this.prisma.news.update({
+    const updateArticle = await this.prisma.article.update({
       where:{
         id: data.id,
       },
@@ -152,9 +152,9 @@ export class NewsService {
       },
     });
 
-    await this.prisma.newsItem.deleteMany({where: {newsId: data.id}});
+    await this.prisma.articleItem.deleteMany({where: {articleId: data.id}});
 
-    if(!data?.contentItems) return await this.getById(updateNews.id);
+    if(!data?.contentItems) return await this.getById(updateArticle.id);
 
     for (const item of data?.contentItems) {
       let picture: Picture;
@@ -181,36 +181,36 @@ export class NewsService {
           await this.fileService.deleteFile(file?.path);
         }
       }
-      await this.prisma.newsItem.create({
+      await this.prisma.articleItem.create({
         data: {
-          newsId: data?.id,
+          articleId: data?.id,
           text: item?.text,
           pictureId: picture?.id || null,
           list: item?.list ? JSON.stringify(item.list) : undefined,
         }});
     }
     
-    return await this.getById(updateNews.id);
+    return await this.getById(updateArticle.id);
   }
 
-  async deleteNews(id: string): Promise<any> {
-    return await this.prisma.news.deleteMany({
+  async deleteArticle(id: string): Promise<any> {
+    return await this.prisma.article.deleteMany({
       where: {id},
     });
   }
 
-  async updateStatus(data: UpdateNewsStatusDto): Promise<GetNewsDto> {
-    const currentNews = await this.getById(data?.newsId);
-    if(!currentNews) return null;
-    await this.prisma.news.update({
+  async updateStatus(data: UpdateArticleStatusDto): Promise<GetArticleDto> {
+    const currentArticle = await this.getById(data?.articleId);
+    if(!currentArticle) return null;
+    await this.prisma.article.update({
       where:{
-        id: data.newsId,
+        id: data.articleId,
       },
       data: {
-        status: data?.status ?? currentNews.status,
+        status: data?.status ?? currentArticle.status,
       },
     });
 
-    return await this.getById(currentNews.id);
+    return await this.getById(currentArticle.id);
   }
 }

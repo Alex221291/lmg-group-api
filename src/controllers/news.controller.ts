@@ -7,14 +7,17 @@ import {
     Delete,
     UseInterceptors,
     UploadedFile,
+    UploadedFiles,
+    Put,
   } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
-import { News } from '@prisma/client';
-import { CreateNewsDto } from 'src/dto/news/create-news.dto';
-import { GetNewsDto } from 'src/dto/news/get-news.dto';
-import { UpdateNewsDto } from 'src/dto/news/update-news.dto';
-import { NewsService } from 'src/services/news.service';
+import { CreateNewsDto } from '../dto/news/create-news.dto';
+import { GetNewsDto } from '../dto/news/get-news.dto';
+import { UpdateNewsDto } from '../dto/news/update-news.dto';
+import { NewsService } from '../services/news.service';
+import { diskStorage } from 'multer';
+import { UpdateNewsStatusDto } from 'src/dto/news/update-news-status.dto';
   
   @ApiTags('News')
   @Controller('news')
@@ -22,20 +25,38 @@ import { NewsService } from 'src/services/news.service';
     constructor(
       private readonly newsService: NewsService
     ) {}
-  
+
     @Post('create')
-    @UseInterceptors(FileInterceptor('file'))
-    async createNews(@UploadedFile() file: Express.Multer.File, @Body() news: CreateNewsDto) {
-      console.log(file);
-      const result = await this.newsService.createNews({path: file?.path, type: file?.mimetype}, news)
-      return result;
+    @UseInterceptors(FilesInterceptor('files[]'))
+    async createNews(@UploadedFiles() files: Express.Multer.File[], @Body() data: CreateNewsDto): Promise<GetNewsDto | null> {
+      if(data?.contentItems){
+        data.contentItems = typeof data.contentItems === 'string' ? JSON.parse(data.contentItems) : data.contentItems;
+      }
+      const filesInfo = files?.map(file => {
+        return {
+          path: file?.path,
+          name: file?.originalname,
+          type: file?.mimetype
+        }
+      });
+      return await this.newsService.createNews(filesInfo, data);
     }
 
     @Post('update')
-    @UseInterceptors(FileInterceptor('file'))
-    async updateNews(@UploadedFile() file: Express.Multer.File, @Body() news: UpdateNewsDto) {
-      console.log(file);
-      const result = await this.newsService.updateNews({path: file?.path, type: file?.mimetype}, news);
+    @UseInterceptors(FilesInterceptor('files[]'))
+    async updateNews(@UploadedFiles() files: Express.Multer.File[], @Body() data: UpdateNewsDto): Promise<GetNewsDto | null> {
+      if(data?.contentItems){
+        data.contentItems = typeof data.contentItems === 'string' ? JSON.parse(data.contentItems) : data.contentItems;
+      }
+
+      const filesInfo = files?.map(file => {
+        return {
+          path: file?.path,
+          name: file?.originalname,
+          type: file?.mimetype
+        }
+      });
+      const result = await this.newsService.updateNews(filesInfo, data);
       return result;
     }
 
@@ -50,8 +71,15 @@ import { NewsService } from 'src/services/news.service';
     }
 
     @Delete('/:id')
-    async deleteNews(@Param('id') id: string): Promise<News> {
+    async deleteNews(@Param('id') id: string): Promise<any> {
       return this.newsService.deleteNews(id);
     }
 
-  }
+    @Put('status')
+    async updateStatus(@Body() data: UpdateNewsStatusDto): Promise<GetNewsDto | null> {
+
+      const result = await this.newsService.updateStatus(data);
+      return result;
+    }
+
+}
