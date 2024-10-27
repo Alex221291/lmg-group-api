@@ -121,6 +121,7 @@ export class NewsService {
           await this.fileService.deleteFile(file?.path);
         }
       }
+      console.log(item?.list);
       await this.prisma.newsItem.create({
         data: {
           newsId: news?.id,
