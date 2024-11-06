@@ -6,6 +6,7 @@ export interface UpdateArticleDto {
     number: string;
     title?: string;
     subtitle?: string;
+    pictureName?: string;
     time?: string;
     video?: string;
     createdAt: string;

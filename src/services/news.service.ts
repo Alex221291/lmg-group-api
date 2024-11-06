@@ -32,6 +32,7 @@ export class NewsService {
       number: answer.number,
       title: answer.title,
       subtitle: answer.subtitle,
+      pictureId: answer.pictureId,
       time: answer.time,
       video: answer.video,
       createdAt: answer.createdAt,
@@ -67,6 +68,7 @@ export class NewsService {
         number: item.number,
         title: item.title,
         subtitle: item.subtitle,
+        pictureId: item.pictureId,
         time: item.time,
         video: item.video,
         createdAt: item.createdAt,
@@ -83,6 +85,9 @@ export class NewsService {
 
   async createNews(filesInfo?: {path: string, name: string, type: string}[], data?: CreateNewsDto): Promise<GetNewsDto> {
 
+    const mainFile = filesInfo.find(f => f.name === data?.pictureName);
+    const mainPicture = await this.addPicture(mainFile);
+
     const news = await this.prisma.news.create({
       data: {
         title: data?.title,
@@ -90,37 +95,21 @@ export class NewsService {
         status: data?.status ?? $Enums.ContentSatus.DRAFT,
         time: data?.time,
         video: data?.video,
+        pictureId: mainPicture?.id || null,
       },
     });
-
     if(!data?.contentItems) return await this.getById(news.id);
 
     for (const item of data?.contentItems) {
       let picture: Picture;
       if (item?.pictureName) {
-        let fileData: Buffer;
         const file = filesInfo.find(f => f.name === item?.pictureName);
+        console.log(2);
+        console.log(item.pictureName);
         console.log(file);
-        if(file?.path){
-          const fileStream = createReadStream(file.path);
-          const chunks = [];
-      
-          for await (const chunk of fileStream) {
-            chunks.push(chunk);
-          }
-      
-          fileData = Buffer.concat(chunks);
-          picture = await this.prisma.picture.create({
-            data: {
-              picture: fileData,
-              name: file.name,
-              type: file.type || 'image/png',
-            },
-          });
-  
-          await this.fileService.deleteFile(file?.path);
-        }
+        picture = await this.addPicture(file);
       }
+      console.log(1);
       console.log(item?.list);
       await this.prisma.newsItem.create({
         data: {
@@ -140,6 +129,11 @@ export class NewsService {
     if(!currentNews) return null;
     console.log(filesInfo[0]);
     console.log(data);
+
+    await this.prisma.picture.deleteMany({where: {id: currentNews?.pictureId}});
+    const mainFile = filesInfo.find(f => f.name === data?.pictureName);
+    const mainPicture = await this.addPicture(mainFile);
+
     const updateNews = await this.prisma.news.update({
       where:{
         id: data.id,
@@ -150,6 +144,7 @@ export class NewsService {
         status: data?.status ?? $Enums.ContentSatus.DRAFT,
         time: data?.time,
         video: data?.video,
+        pictureId: mainPicture?.id || null,
       },
     });
 
@@ -160,27 +155,8 @@ export class NewsService {
     for (const item of data?.contentItems) {
       let picture: Picture;
       if (item?.pictureName) {
-        let fileData: Buffer;
         const file = filesInfo.find(f => f.name == item?.pictureName);
-        if(file?.path){
-          const fileStream = createReadStream(file.path);
-          const chunks = [];
-      
-          for await (const chunk of fileStream) {
-            chunks.push(chunk);
-          }
-      
-          fileData = Buffer.concat(chunks);
-          picture = await this.prisma.picture.create({
-            data: {
-              picture: fileData,
-              name: file.name,
-              type: file.type || 'image/png',
-            },
-          });
-  
-          await this.fileService.deleteFile(file?.path);
-        }
+        picture = await this.addPicture(file);
       }
       await this.prisma.newsItem.create({
         data: {
@@ -213,5 +189,31 @@ export class NewsService {
     });
 
     return await this.getById(currentNews.id);
+  }
+
+  private async addPicture(file?: {path: string, name: string, type: string}){
+    let fileData: Buffer;
+    let picture;
+    console.log(file);
+    if(file?.path){
+      const fileStream = createReadStream(file.path);
+      const chunks = [];
+  
+      for await (const chunk of fileStream) {
+        chunks.push(chunk);
+      }
+  
+      fileData = Buffer.concat(chunks);
+      picture = await this.prisma.picture.create({
+        data: {
+          picture: fileData,
+          name: file.name,
+          type: file.type || 'image/png',
+        },
+      });
+
+      await this.fileService.deleteFile(file?.path);
+    }
+    return picture || null;
   }
 }

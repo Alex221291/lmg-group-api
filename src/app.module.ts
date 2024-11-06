@@ -11,6 +11,10 @@ import { MailService } from './services/mail.service';
 import { MailController } from './controllers/mail.controller';
 import { ArticleController } from './controllers/article.controller';
 import { ArticleService } from './services/article.service';
+import { PortfolioController } from './controllers/portfolio.controller';
+import { PortfolioCategoryController } from './controllers/portfolio-category.controller';
+import { PortfolioService } from './services/portfolio.service';
+import { PortfolioCategoryService } from './services/portfolio-category.service';
 
 @Module({
   imports: [
@@ -18,7 +22,7 @@ import { ArticleService } from './services/article.service';
     dest: './uploads',
     }),
   ],
-  controllers: [ PictureController, AppController, NewsController, MailController, ArticleController],
-  providers: [ PrismaService, PictureService, FileService, NewsService, MailService, ArticleService],
+  controllers: [ PictureController, AppController, NewsController, MailController, ArticleController, PortfolioController, PortfolioCategoryController],
+  providers: [ PrismaService, PictureService, FileService, NewsService, MailService, ArticleService, PortfolioService, PortfolioCategoryService],
 })
 export class AppModule {}

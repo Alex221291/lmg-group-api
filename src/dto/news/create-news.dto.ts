@@ -3,6 +3,7 @@ import { $Enums } from '@prisma/client';
 export interface CreateNewsDto {
     title?: string;
     subtitle?: string;
+    pictureName? : string;
     time?: string;
     video?: string;
     status: $Enums.ContentSatus;

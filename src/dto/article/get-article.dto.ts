@@ -6,6 +6,7 @@ export interface GetArticleDto {
     number?: number;
     title?: string;
     subtitle?: string;
+    pictureId?: string;
     time?: string;
     video?: string;
     createdAt?: Date;

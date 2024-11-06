@@ -4,6 +4,7 @@ export interface GetNewsDto {
     id: string;
     number?: number;
     title?: string;
+    pictureId?: string;
     subtitle?: string;
     time?: string;
     video?: string;
