@@ -76,7 +76,7 @@ export class ArticleService {
         updatedAt: item.updatedAt,
         list: item.list ? JSON.parse(item.list as unknown as string) : [],
         status: item.status,
-        articleItems: item.articleItem.map((item) => ({
+        contentItems: item.articleItem.map((item) => ({
           text: item.text,
           pictureId: item.pictureId,
           list: item.list ? JSON.parse(item.list as unknown as string) : undefined,
