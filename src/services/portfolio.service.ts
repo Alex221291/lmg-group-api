@@ -120,7 +120,7 @@ export class PortfolioService {
   private async addPicture(file?: {path: string, name: string, type: string}){
     let fileData: Buffer;
     let picture;
-    console.log(file);
+
     if(file?.path){
       const fileStream = createReadStream(file.path);
       const chunks = [];

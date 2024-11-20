@@ -1,4 +1,3 @@
-import { ApiProperty } from "@nestjs/swagger";
 import { $Enums } from "@prisma/client";
 
 export interface GetPortfolioDto {

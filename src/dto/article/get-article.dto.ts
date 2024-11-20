@@ -1,5 +1,5 @@
 import { $Enums } from "@prisma/client";
-import { GetItemDto } from "../news/get-news.dto";
+import { GetItemDto, GetListDto } from "../news/get-news.dto";
 
 export interface GetArticleDto {
     id: string;
@@ -11,6 +11,7 @@ export interface GetArticleDto {
     video?: string;
     createdAt?: Date;
     updatedAt?: Date;
+    list?: GetListDto[];
     status: $Enums.ContentSatus;
     contentItems?: GetItemDto[];
 }

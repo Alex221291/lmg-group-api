@@ -8,6 +8,7 @@ export interface GetNewsDto {
     subtitle?: string;
     time?: string;
     video?: string;
+    list?: GetListDto[];
     createdAt?: Date;
     updatedAt?: Date;
     status: $Enums.ContentSatus;

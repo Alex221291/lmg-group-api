@@ -15,4 +15,12 @@ export class FileService {
             }
         });
     }
+
+    async  deleteFiles(filesInfo) {
+        filesInfo.forEach(async (file) => {
+            if (file?.path) {
+                await this.deleteFile(file.path);
+            }
+        });
+    }    
 }

@@ -33,10 +33,11 @@ model News {
   number      Int        @default(autoincrement())
   title     String? @db.VarChar(500)
   subtitle     String? @db.VarChar(500)
-  picture     Picture?   @relation(fields: [pictureId], references: [id], onDelete: Cascade)
+  picture     Picture?   @relation(fields: [pictureId], references: [id])
   pictureId   String?    @default(uuid())
   time String?
   video String?
+  list        Json?
   status    ContentSatus?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -49,10 +50,11 @@ model Article {
   number      Int        @default(autoincrement())
   title     String? @db.VarChar(500)
   subtitle     String? @db.VarChar(500)
-  picture     Picture?   @relation(fields: [pictureId], references: [id], onDelete: Cascade)
+  picture     Picture?   @relation(fields: [pictureId], references: [id])
   pictureId   String?    @default(uuid())
   time String?
   video String?
+  list        Json?
   status    ContentSatus?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

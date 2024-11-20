@@ -38,10 +38,11 @@ export class NewsService {
       createdAt: answer.createdAt,
       updatedAt: answer.updatedAt,
       status: answer.status,
+      list: answer.list ? JSON.parse(answer.list as unknown as string) : [],
       contentItems: answer.newsItem.map((item) => ({
         text: item.text,
         pictureId: item.pictureId,
-        list: item.list ? JSON.parse(item.list as unknown as string) : undefined,
+        list: item.list ? JSON.parse(item.list as unknown as string) : null,
       })),
     };
 
@@ -73,19 +74,19 @@ export class NewsService {
         video: item.video,
         createdAt: item.createdAt,
         updatedAt: item.updatedAt,
+        list: item.list ? JSON.parse(item.list as unknown as string) : [],
         status: item.status,
         newsItems: item.newsItem.map((item) => ({
           text: item.text,
           pictureId: item.pictureId,
-          list: item.list ? JSON.parse(item.list as unknown as string) : undefined,
+          list: item.list ? JSON.parse(item.list as unknown as string) : null,
         })),
       }
     })
   }
 
   async createNews(filesInfo?: {path: string, name: string, type: string}[], data?: CreateNewsDto): Promise<GetNewsDto> {
-
-    const mainFile = filesInfo.find(f => f.name === data?.pictureName);
+    const mainFile = filesInfo.find(f => data.pictureName && data.pictureName !== null && f.name === data.pictureName) || null;
     const mainPicture = await this.addPicture(mainFile);
 
     const news = await this.prisma.news.create({
@@ -95,22 +96,22 @@ export class NewsService {
         status: data?.status ?? $Enums.ContentSatus.DRAFT,
         time: data?.time,
         video: data?.video,
+        list: data?.list ? JSON.stringify(data.list) : undefined,
         pictureId: mainPicture?.id || null,
       },
     });
-    if(!data?.contentItems) return await this.getById(news.id);
+
+    if(!data?.contentItems) {
+      await this.fileService.deleteFiles(filesInfo);
+      return await this.getById(news.id);
+    }
 
     for (const item of data?.contentItems) {
       let picture: Picture;
       if (item?.pictureName) {
         const file = filesInfo.find(f => f.name === item?.pictureName);
-        console.log(2);
-        console.log(item.pictureName);
-        console.log(file);
         picture = await this.addPicture(file);
       }
-      console.log(1);
-      console.log(item?.list);
       await this.prisma.newsItem.create({
         data: {
           newsId: news?.id,
@@ -119,7 +120,7 @@ export class NewsService {
           list: item?.list ? JSON.stringify(item.list) : undefined,
         }});
     }
-    
+    await this.fileService.deleteFiles(filesInfo);
     return await this.getById(news.id);
   }
 
@@ -127,11 +128,9 @@ export class NewsService {
 
     const currentNews = await this.getById(data?.id);
     if(!currentNews) return null;
-    console.log(filesInfo[0]);
-    console.log(data);
 
-    await this.prisma.picture.deleteMany({where: {id: currentNews?.pictureId}});
-    const mainFile = filesInfo.find(f => f.name === data?.pictureName);
+    await this.prisma.picture.deleteMany({where: {id: currentNews?.pictureId || ''}});
+    const mainFile = filesInfo.find(f => data.pictureName && data.pictureName !== null && f.name === data.pictureName) || null;
     const mainPicture = await this.addPicture(mainFile);
 
     const updateNews = await this.prisma.news.update({
@@ -144,13 +143,17 @@ export class NewsService {
         status: data?.status ?? $Enums.ContentSatus.DRAFT,
         time: data?.time,
         video: data?.video,
+        list: data?.list ? JSON.stringify(data.list) : undefined,
         pictureId: mainPicture?.id || null,
       },
     });
 
     await this.prisma.newsItem.deleteMany({where: {newsId: data.id}});
 
-    if(!data?.contentItems) return await this.getById(updateNews.id);
+    if(!data?.contentItems) {
+      await this.fileService.deleteFiles(filesInfo);
+      return await this.getById(updateNews.id);
+    }
 
     for (const item of data?.contentItems) {
       let picture: Picture;
@@ -167,6 +170,7 @@ export class NewsService {
         }});
     }
     
+    await this.fileService.deleteFiles(filesInfo);
     return await this.getById(updateNews.id);
   }
 
@@ -194,7 +198,7 @@ export class NewsService {
   private async addPicture(file?: {path: string, name: string, type: string}){
     let fileData: Buffer;
     let picture;
-    console.log(file);
+
     if(file?.path){
       const fileStream = createReadStream(file.path);
       const chunks = [];
@@ -211,8 +215,6 @@ export class NewsService {
           type: file.type || 'image/png',
         },
       });
-
-      await this.fileService.deleteFile(file?.path);
     }
     return picture || null;
   }

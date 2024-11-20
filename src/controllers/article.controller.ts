@@ -30,6 +30,10 @@ export class ArticleController {
     if(data?.contentItems){
       data.contentItems = typeof data.contentItems === 'string' ? JSON.parse(data.contentItems) : data.contentItems;
     }
+    if(data?.list){
+      data.list = typeof data.list === 'string' ? JSON.parse(data.list) : data.list;
+    }
+    
     const filesInfo = files?.map(file => {
       return {
         path: file?.path,
@@ -45,6 +49,9 @@ export class ArticleController {
   async updateArticle(@UploadedFiles() files: Express.Multer.File[], @Body() data: UpdateArticleDto): Promise<GetArticleDto | null> {
     if(data?.contentItems){
       data.contentItems = typeof data.contentItems === 'string' ? JSON.parse(data.contentItems) : data.contentItems;
+    }
+    if(data?.list){
+      data.list = typeof data.list === 'string' ? JSON.parse(data.list) : data.list;
     }
 
     const filesInfo = files?.map(file => {
