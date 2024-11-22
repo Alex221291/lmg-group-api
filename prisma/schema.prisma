@@ -25,6 +25,10 @@ model Picture {
   portfolio Portfolio[]
   news News[]
   article Article[]
+  Area Area[]
+  wBuilds Build[] @relation("WPictureRelation") 
+  gBuilds Build[] @relation("GPictureRelation")
+  feedback Feedback[]
   @@map("pictures")
 }
 
@@ -112,6 +116,84 @@ model PortfolioCategory {
   updatedAt DateTime @updatedAt
   portfolio Portfolio[]
   @@map("portfolio_categories")
+}
+
+model Section {
+  id                String        @default(uuid()) @id
+  number            Int           @default(autoincrement())
+  title             String?       @db.VarChar(500)
+  description       String?       @db.VarChar(3000)
+  status            ContentSatus?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  sectionArea SectionArea[]
+  @@map("sections")
+}
+
+model Area {
+  id                String        @default(uuid()) @id
+  number            Int           @default(autoincrement())
+  lat               String?       @db.VarChar(100)
+  lon               String?       @db.VarChar(100)
+  name              String?       @db.VarChar(500)
+  title             String?       @db.VarChar(500)
+  description       String?       @db.VarChar(3000)
+  subTitle          String?       @db.VarChar(500)
+  status            ContentSatus?
+  picture     Picture?   @relation(fields: [pictureId], references: [id])
+  pictureId   String?    @default(uuid())
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  sectionArea SectionArea[]
+  @@map("areas")
+}
+
+model SectionArea {
+  id                String        @default(uuid()) @id
+  sectionId String  @default(uuid())
+  areaId    String  @default(uuid())
+  section   Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  area      Area     @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  build             Build[]
+  @@map("section_area")
+}
+
+model Build {
+  id                String        @default(uuid()) @id
+  number            Int           @default(autoincrement())
+  lat               String?       @db.VarChar(100)
+  lon               String?       @db.VarChar(100)
+  name              String?       @db.VarChar(500)
+  wPicture     Picture?   @relation("WPictureRelation", fields: [wPictureId], references: [id])
+  wPictureId   String?    @default(uuid())
+  wDescription       String?       @db.VarChar(3000)
+  gPicture     Picture?   @relation("GPictureRelation", fields: [gPictureId], references: [id])
+  gPictureId   String?    @default(uuid())
+  gTitle             String?       @db.VarChar(500)
+  gSubTitle             String?       @db.VarChar(500)
+  list        Json?
+  status            ContentSatus?
+  sectionAreaId    String?  @default(uuid())
+  sectionArea      SectionArea?     @relation(fields: [sectionAreaId], references: [id], onDelete: Cascade)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  @@map("builds")
+}
+
+model Feedback {
+  id    String     @default(uuid()) @id
+  number      Int        @default(autoincrement())
+  title     String? @db.VarChar(500)
+  description   String? @db.VarChar(3000)
+  video String?
+  picture    Picture?    @relation(fields: [pictureId], references: [id])
+  pictureId  String? @default(uuid())
+  status    ContentSatus?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("feedbacks")
 }
 
 enum ContentSatus {
