@@ -154,6 +154,7 @@ model SectionArea {
   areaId    String  @default(uuid())
   section   Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   area      Area     @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  status    ContentSatus?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   build             Build[]

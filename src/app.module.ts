@@ -17,6 +17,8 @@ import { PortfolioService } from './services/portfolio.service';
 import { PortfolioCategoryService } from './services/portfolio-category.service';
 import { FeedbackController } from './controllers/feedback.controller';
 import { FeedbackService } from './services/feedback.service';
+import { SectionService } from './services/section.service';
+import { SectionController } from './controllers/section.controller';
 
 @Module({
   imports: [
@@ -24,7 +26,7 @@ import { FeedbackService } from './services/feedback.service';
     dest: './uploads',
     }),
   ],
-  controllers: [ PictureController, AppController, NewsController, MailController, ArticleController, PortfolioController, PortfolioCategoryController, FeedbackController],
-  providers: [ PrismaService, PictureService, FileService, NewsService, MailService, ArticleService, PortfolioService, PortfolioCategoryService, FeedbackService],
+  controllers: [ PictureController, AppController, NewsController, MailController, ArticleController, PortfolioController, PortfolioCategoryController, FeedbackController, SectionController],
+  providers: [ PrismaService, PictureService, FileService, NewsService, MailService, ArticleService, PortfolioService, PortfolioCategoryService, FeedbackService, SectionService],
 })
 export class AppModule {}
