@@ -27,17 +27,17 @@ import { PortfolioService } from 'src/services/portfolio.service';
   
     @Post('create')
     @UseInterceptors(FileInterceptor('file'))
-    async create(@UploadedFile() file: Express.Multer.File, @Body() news: CreatePortfolioDto) {
+    async create(@UploadedFile() file: Express.Multer.File, @Body() data: CreatePortfolioDto) {
 
-      const result = await this.portfolioService.create({path: file?.path, type: file?.mimetype, name:file?.originalname}, news)
+      const result = await this.portfolioService.create({path: file?.path, type: file?.mimetype, name:file?.originalname}, data)
       return result;
     }
 
     @Post('update')
     @UseInterceptors(FileInterceptor('file'))
-    async update(@UploadedFile() file: Express.Multer.File, @Body() news: UpdatePortfolioDto) {
+    async update(@UploadedFile() file: Express.Multer.File, @Body() data: UpdatePortfolioDto) {
 
-      const result = await this.portfolioService.update({path: file?.path, type: file?.mimetype, name: file?.originalname}, news);
+      const result = await this.portfolioService.update({path: file?.path, type: file?.mimetype, name: file?.originalname}, data);
       return result;
     }
 

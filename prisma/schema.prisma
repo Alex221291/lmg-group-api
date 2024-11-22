@@ -96,7 +96,7 @@ model Portfolio {
   categoryName String?
   category    PortfolioCategory?    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId  String? @default(uuid())
-  picture    Picture?    @relation(fields: [pictureId], references: [id], onDelete: Cascade)
+  picture    Picture?    @relation(fields: [pictureId], references: [id])
   pictureId  String? @default(uuid())
   status    ContentSatus?
   createdAt DateTime @default(now())

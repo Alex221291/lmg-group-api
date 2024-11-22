@@ -58,7 +58,8 @@ export class PortfolioService {
         description: data?.description,
         categoryName: data?.categoryName,
         status: data?.status,
-        pictureId: picture?.id
+        pictureId: picture?.id,
+        categoryId: null,
       },
     });
   }
@@ -83,7 +84,8 @@ export class PortfolioService {
         description: data?.description,
         categoryName: data?.categoryName,
         status: data?.status,
-        pictureId: picture?.id
+        pictureId: picture?.id,
+        categoryId: null,
       },
     });
   }
