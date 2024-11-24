@@ -85,11 +85,11 @@ model Article {
 model NewsItem {
   id          String     @default(uuid()) @id
   text        String?    @db.VarChar(3000)
-  picture     Picture?   @relation(fields: [pictureId], references: [id], onDelete: Cascade)
+  picture     Picture?   @relation(fields: [pictureId], references: [id])
   pictureId   String?    @default(uuid())
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  news     News?   @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  news     News?   @relation(fields: [newsId], references: [id])
   newsId String?    @default(uuid())
   list        Json?
   @@map("news_items")
@@ -98,11 +98,11 @@ model NewsItem {
 model ArticleItem {
   id          String     @default(uuid()) @id
   text        String?    @db.VarChar(3000)
-  picture     Picture?   @relation(fields: [pictureId], references: [id], onDelete: Cascade)
+  picture     Picture?   @relation(fields: [pictureId], references: [id])
   pictureId   String?    @default(uuid())
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
-  article     Article?   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  article     Article?   @relation(fields: [articleId], references: [id])
   articleId String?    @default(uuid())
   list        Json?
   @@map("article_items")
@@ -114,7 +114,7 @@ model Portfolio {
   title     String? @db.VarChar(500)
   description   String? @db.VarChar(3000)
   categoryName String?
-  category    Category?    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category    Category?    @relation(fields: [categoryId], references: [id])
   categoryId  String? @default(uuid())
   picture    Picture?    @relation(fields: [pictureId], references: [id])
   pictureId  String? @default(uuid())
@@ -142,7 +142,7 @@ model Category {
   title     String? @db.VarChar(500)
   description   String? @db.VarChar(3000)
   subtitle     String? @db.VarChar(500)
-  section    Section?    @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  section    Section?    @relation(fields: [sectionId], references: [id])
   sectionId  String? @default(uuid())
   picture    Picture?    @relation(fields: [pictureId], references: [id])
   pictureId  String? @default(uuid())
@@ -179,8 +179,8 @@ model CategoryArea {
   id                String        @default(uuid()) @id
   categoryId String  @default(uuid())
   areaId    String  @default(uuid())
-  category   Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  area      Area     @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  category   Category  @relation(fields: [categoryId], references: [id])
+  area      Area     @relation(fields: [areaId], references: [id])
   status    ContentSatus?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
@@ -201,7 +201,7 @@ model Build {
   list              Json?
   status            ContentSatus?
   categoryAreaId     String?  @default(uuid())
-  categoryArea       CategoryArea?     @relation(fields: [categoryAreaId], references: [id], onDelete: Cascade)
+  categoryArea       CategoryArea?     @relation(fields: [categoryAreaId], references: [id])
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   @@map("builds")

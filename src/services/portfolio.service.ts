@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
-import { Picture, Portfolio } from '@prisma/client';
+import { Portfolio } from '@prisma/client';
 import { createReadStream } from 'fs';
 import { FileService } from './file.service';
 import { GetPortfolioDto } from 'src/dto/portfolio/get-portfolio.dto';
@@ -25,7 +25,7 @@ export class PortfolioService {
       title: answer?.title,
       description: answer?.description,
       status: answer?.status,
-      categoryName: answer?.categoryName,
+      categoryId: answer?.categoryId,
       pictureId: answer?.pictureId,
     };
   }
@@ -56,10 +56,9 @@ export class PortfolioService {
       data: {
         title: data?.title,
         description: data?.description,
-        categoryName: data?.categoryName,
         status: data?.status,
         pictureId: picture?.id,
-        categoryId: null,
+        categoryId: data?.categoryId,
       },
     });
   }
@@ -82,10 +81,10 @@ export class PortfolioService {
       data: {
         title: data?.title,
         description: data?.description,
-        categoryName: data?.categoryName,
+        categoryName: data?.categoryId,
         status: data?.status,
         pictureId: picture?.id,
-        categoryId: null,
+        categoryId: data?.categoryId,
       },
     });
   }

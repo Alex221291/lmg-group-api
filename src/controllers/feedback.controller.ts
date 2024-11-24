@@ -8,8 +8,10 @@ import {
     UseInterceptors,
     UploadedFile,
     Put,
+    UploadedFiles,
+    BadRequestException,
   } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateFeedbackDto } from 'src/dto/feedback/create-feedback.dto';
 import { GetFeedbackDto } from 'src/dto/feedback/get-feedback.dto';
@@ -25,24 +27,63 @@ import { FeedbackService } from 'src/services/feedback.service';
     ) {}
   
     @Post('create')
-    @UseInterceptors(FileInterceptor('file'))
-    async create(@UploadedFile() file: Express.Multer.File, @Body() data: CreateFeedbackDto) {
-      const result = await this.feedbackService.create({path: file?.path, type: file?.mimetype, name:file?.originalname}, data)
+    @UseInterceptors(
+      FileFieldsInterceptor([
+        { name: 'file', maxCount: 1 },
+        { name: 'video', maxCount: 1 },
+      ]),
+    )
+    async create(
+      @UploadedFiles() files: { file?: Express.Multer.File[]; video?: Express.Multer.File[] },
+      @Body() data: CreateFeedbackDto,
+    ) {
+      const file = files.file ? files?.file[0] : null;
+      const video = files?.video ? files?.video[0] : null;
+  
+      const fileInfo = {
+        path: file?.path,
+        name: file?.originalname,
+        type: file?.mimetype,
+      };
+  
+      const videoInfo = {
+        path: video?.path,
+        filename: video?.filename,
+        originalname: video?.originalname,
+      };
+  
+      const result = await this.feedbackService.create(fileInfo, videoInfo, data);
       return result;
     }
 
     @Post('update')
-    @UseInterceptors(FileInterceptor('file'))
-    async update(@UploadedFile() file: Express.Multer.File, @Body() data: UpdateFeedbackDto) {
+    @UseInterceptors(
+      FileFieldsInterceptor([
+        { name: 'file', maxCount: 1 },
+        { name: 'video', maxCount: 1 },
+      ]),
+    )
+    async update(@UploadedFiles() files: { file?: Express.Multer.File[]; video?: Express.Multer.File[] },
+    @Body() data: UpdateFeedbackDto,
+  ) {
+    const file = files.file ? files?.file[0] : null;
+    const video = files?.video ? files?.video[0] : null;
 
-      const result = await this.feedbackService.update({path: file?.path, type: file?.mimetype, name: file?.originalname}, data);
-      return result;
-    }
+    const fileInfo = {
+      path: file?.path,
+      name: file?.originalname,
+      type: file?.mimetype,
+    };
 
-    @Get('/:id')
-    async getById(@Param('id') id: string): Promise<GetFeedbackDto> {
-      return this.feedbackService.getById(id);
-    }
+    const videoInfo = {
+      path: video?.path,
+      filename: video?.filename,
+      originalname: video?.originalname,
+    };
+
+    const result = await this.feedbackService.update(fileInfo, videoInfo, data);
+    return result;
+  }
   
     @Get()
     async getAll(): Promise<GetFeedbackDto[]> {
@@ -61,3 +102,4 @@ import { FeedbackService } from 'src/services/feedback.service';
       return result;
     }
   }
+  

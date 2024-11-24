@@ -8,26 +8,26 @@ export class BuildController {
 
   @Post()
   async create(@Body() data: CreateBuildDto) {
-    return this.buildService.create(data);
+    return await this.buildService.create(data);
   }
 
   @Get()
   async findAll(@Query('categoryAreaId') categoryAreaId: string) {
-    return this.buildService.findAll(categoryAreaId);
+    return await this.buildService.findAll(categoryAreaId);
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return this.buildService.findOne(id);
+    return await this.buildService.findOne(id);
   }
 
   @Put(':id')
   async update(@Param('id') id: string, @Body() data: CreateBuildDto) {
-    return this.buildService.update(id, data);
+    return await this.buildService.update(id, data);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    return this.buildService.remove(id);
+    return await this.buildService.remove(id);
   }
 }

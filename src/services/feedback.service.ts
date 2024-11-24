@@ -48,21 +48,31 @@ export class FeedbackService {
     })
   }
 
-  async create(fileInfo?: {path: string, name: string, type: string}, data?: CreateFeedbackDto): Promise<any> {
+  async create(fileInfo?: {path?: string, name?: string, type?: string}, videoInfo?: {filename?: string, originalname?: string, path?: string}, data?: CreateFeedbackDto): Promise<any> {
+    console.log({fileInfo, videoInfo});
     const picture = await this.addPicture(fileInfo);
+    const video = await this.addVideo(videoInfo);
+    console.log({picture, video});
     return await this.prisma.feedback.create({
-      data :{...data, pictureId: picture?.id, videoId: null}
+      data :{...data, pictureId: picture?.id || null, videoId: video?.id || null}
     });
   }
 
-  async update(fileInfo?: {path: string, type: string, name: string}, data?: UpdateFeedbackDto): Promise<any> {
+  async update(fileInfo?: {path?: string, type?: string, name?: string}, videoInfo?: {filename?: string, originalname?: string, path?: string}, data?: UpdateFeedbackDto): Promise<any> {
     const updateItem = await this.getById(data?.id);
 
     const picture = await this.addPicture(fileInfo);
 
+    const video = await this.addVideo(videoInfo);
+
     await this.prisma.picture.deleteMany({
       where : {
         id: updateItem?.pictureId || ''
+      }
+    });
+    await this.prisma.video.deleteMany({
+      where : {
+        id: updateItem?.videoId || ''
       }
     });
     
@@ -70,7 +80,7 @@ export class FeedbackService {
       where:{
         id: data.id,
       },
-      data :{...data, pictureId: picture?.id, videoId: null}
+      data :{...data, pictureId: picture?.id || null, videoId: video?.id || null}
     });
   }
 
@@ -103,7 +113,7 @@ export class FeedbackService {
     return await this.getById(currentItem.id);
   }
 
-  private async addPicture(file?: {path: string, name: string, type: string}){
+  private async addPicture(file?: {path?: string, name?: string, type?: string}){
     let fileData: Buffer;
     let picture;
 
@@ -126,6 +136,17 @@ export class FeedbackService {
 
       await this.fileService.deleteFile(file?.path);
     }
+    console.log(picture);
     return picture || null;
+  }
+
+  private async addVideo(videoInfo?: {filename?: string, originalname?: string, path?: string}){
+    let video;
+    if(videoInfo?.path){
+      video = await this.prisma.video.create({
+        data: videoInfo,
+      });
+    }
+    return video || null;
   }
 }

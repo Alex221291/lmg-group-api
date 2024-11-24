@@ -5,7 +5,7 @@ export interface GetPortfolioDto {
     number?: number;
     title?: string;
     description?: string;
-    categoryName?: string;
+    categoryId?: string;
     status: $Enums.ContentSatus;
     pictureId?: string;
 }

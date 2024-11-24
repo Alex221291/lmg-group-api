@@ -4,6 +4,6 @@ export interface UpdatePortfolioDto {
     id: string;
     title?: string;
     description?: string;
-    categoryName?: string;
+    categoryId?: string;
     status: $Enums.ContentSatus;
 }
