@@ -6,11 +6,11 @@ import { CreateCategoryAreaDto } from '../dto/category-area/create-category-area
 export class CategoryAreaService {
   constructor(private prisma: PrismaService) {}
 
-  create(data: CreateCategoryAreaDto) {
-    return this.prisma.categoryArea.create({ data });
+  async create(data: CreateCategoryAreaDto) {
+    return await this.prisma.categoryArea.create({ data });
   }
 
-  findAll(categoryId?: string) {
+  async findAll(categoryId?: string) {
     let params: any = {
       include: {
         area: {},
@@ -22,18 +22,18 @@ export class CategoryAreaService {
     if(categoryId){
       params = {...params, where:{categoryId}};
     }
-    return this.prisma.categoryArea.findMany(params);
+    return await this.prisma.categoryArea.findMany(params);
   }
 
-  findOne(id: string) {
-    return this.prisma.categoryArea.findUnique({ where: { id } });
+  async findOne(id: string) {
+    return await this.prisma.categoryArea.findUnique({ where: { id } });
   }
 
-  update(id: string, data: CreateCategoryAreaDto) {
-    return this.prisma.categoryArea.update({ where: { id }, data });
+  async update(id: string, data: CreateCategoryAreaDto) {
+    return await this.prisma.categoryArea.update({ where: { id }, data });
   }
 
-  remove(id: string) {
-    return this.prisma.categoryArea.delete({ where: { id } });
+  async remove(id: string) {
+    return await this.prisma.categoryArea.delete({ where: { id } });
   }
 }

@@ -7,23 +7,23 @@ import { GetSectionDto } from 'src/dto/section/get-section.dto';
 export class SectionService {
   constructor(private prisma: PrismaService) {}
 
-  create(data: CreateSectionDto) {
-    return this.prisma.section.create({ data });
+  async create(data: CreateSectionDto) {
+    return await this.prisma.section.create({ data });
   }
 
-  findAll():Promise<GetSectionDto[] | []> {
-    return this.prisma.section.findMany();
+  async findAll():Promise<GetSectionDto[] | []> {
+    return await this.prisma.section.findMany();
   }
 
-  findOne(id: string) {
-    return this.prisma.section.findUnique({ where: { id } });
+  async findOne(id: string) {
+    return await this.prisma.section.findUnique({ where: { id } });
   }
 
-  update(id: string, data: CreateSectionDto) {
-    return this.prisma.section.update({ where: { id }, data });
+  async update(id: string, data: CreateSectionDto) {
+    return await this.prisma.section.update({ where: { id }, data });
   }
 
-  remove(id: string) {
-    return this.prisma.section.delete({ where: { id } });
+  async remove(id: string) {
+    return await this.prisma.section.delete({ where: { id } });
   }
 }

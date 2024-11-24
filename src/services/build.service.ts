@@ -7,8 +7,8 @@ import { GetBuildDto } from 'src/dto/build/get-build.dto';
 export class BuildService {
   constructor(private prisma: PrismaService) {}
 
-  create(data: CreateBuildDto) {
-    return this.prisma.build.create({ 
+  async create(data: CreateBuildDto) {
+    return await this.prisma.build.create({ 
         data:{
             gTitle: data?.gTitle, 
         }
@@ -40,19 +40,34 @@ export class BuildService {
     }));
   }
 
-  findOne(id: string) {
-    return this.prisma.build.findUnique({ where: { id } });
+  async findOne(id: string) {
+    const build = await this.prisma.build.findUnique({ where: { id } });
+    return{
+      id: build.id,
+      number: build.number,
+      coordinates: build.coordinates ? JSON.parse(build.coordinates as unknown as string) : [],
+      name: build.name,
+      wDescription: build.wDescription,
+      pictureId: build.pictureId,
+      gTitle: build.gTitle,
+      gSubTitle: build.gSubTitle,
+      list: build.list ? JSON.parse(build.list as unknown as string) : [],
+      status: build.status,
+      categoryAreaId: build.categoryAreaId,
+      createdAt: build.createdAt,
+      updatedAt: build.updatedAt
+    };
   }
 
-  update(id: string, data: CreateBuildDto) {
-    return this.prisma.build.update({ where: { id }, 
+  async update(id: string, data: CreateBuildDto) {
+    return await this.prisma.build.update({ where: { id }, 
         data:{
             gTitle: data?.gTitle, 
         }
     });
   }
 
-  remove(id: string) {
-    return this.prisma.build.delete({ where: { id } });
+  async remove(id: string) {
+    return await this.prisma.build.delete({ where: { id } });
   }
 }

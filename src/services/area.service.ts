@@ -6,23 +6,23 @@ import { CreateAreaDto } from '../dto/area/create-area.dto';
 export class AreaService {
   constructor(private prisma: PrismaService) {}
 
-  create(data: CreateAreaDto) {
-    return this.prisma.area.create({ data });
+  async create(data: CreateAreaDto) {
+    return await this.prisma.area.create({ data });
   }
 
-  findAll() {
-    return this.prisma.area.findMany();
+  async findAll() {
+    return await this.prisma.area.findMany();
   }
 
-  findOne(id: string) {
-    return this.prisma.area.findUnique({ where: { id } });
+  async findOne(id: string) {
+    return await this.prisma.area.findUnique({ where: { id } });
   }
 
-  update(id: string, data: CreateAreaDto) {
-    return this.prisma.area.update({ where: { id }, data });
+  async update(id: string, data: CreateAreaDto) {
+    return await this.prisma.area.update({ where: { id }, data });
   }
 
-  remove(id: string) {
-    return this.prisma.area.delete({ where: { id } });
+  async remove(id: string) {
+    return await this.prisma.area.delete({ where: { id } });
   }
 }

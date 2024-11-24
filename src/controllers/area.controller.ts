@@ -7,27 +7,27 @@ export class AreaController {
   constructor(private readonly areaService: AreaService) {}
 
   @Post()
-  create(@Body() data: CreateAreaDto) {
-    return this.areaService.create(data);
+  async create(@Body() data: CreateAreaDto) {
+    return await this.areaService.create(data);
   }
 
   @Get()
-  findAll() {
-    return this.areaService.findAll();
+  async findAll() {
+    return await this.areaService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.areaService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.areaService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() data: CreateAreaDto) {
-    return this.areaService.update(id, data);
+  async update(@Param('id') id: string, @Body() data: CreateAreaDto) {
+    return await this.areaService.update(id, data);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.areaService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.areaService.remove(id);
   }
 }

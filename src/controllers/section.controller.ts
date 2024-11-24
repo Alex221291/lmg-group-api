@@ -8,27 +8,27 @@ export class SectionController {
   constructor(private readonly sectionsService: SectionService) {}
 
   @Post()
-  create(@Body() data: CreateSectionDto) {
-    return this.sectionsService.create(data);
+  async create(@Body() data: CreateSectionDto) {
+    return await this.sectionsService.create(data);
   }
 
   @Get()
-  findAll(): Promise<GetSectionDto[]> {
-    return this.sectionsService.findAll();
+  async findAll(): Promise<GetSectionDto[]> {
+    return await this.sectionsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.sectionsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.sectionsService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() data: CreateSectionDto) {
-    return this.sectionsService.update(id, data);
+  async update(@Param('id') id: string, @Body() data: CreateSectionDto) {
+    return await this.sectionsService.update(id, data);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.sectionsService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.sectionsService.remove(id);
   }
 }
