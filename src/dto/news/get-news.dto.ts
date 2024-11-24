@@ -7,7 +7,7 @@ export interface GetNewsDto {
     pictureId?: string;
     subtitle?: string;
     time?: string;
-    video?: string;
+    videoId?: string;
     list?: GetListDto[];
     createdAt?: Date;
     updatedAt?: Date;

@@ -26,10 +26,24 @@ model Picture {
   news News[]
   article Article[]
   Area Area[]
-  wBuilds Build[] @relation("WPictureRelation") 
-  gBuilds Build[] @relation("GPictureRelation")
+  builds Build[]
   feedback Feedback[]
+  category Category[]
   @@map("pictures")
+}
+
+model Video {
+  id    String     @default(uuid()) @id
+  originalname String? 
+  filename String?
+  path String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  feedback Feedback[]
+  category Category[]
+  news News[]
+  article Article[]
+  @@map("videos")
 }
 
 model News {
@@ -40,7 +54,8 @@ model News {
   picture     Picture?   @relation(fields: [pictureId], references: [id])
   pictureId   String?    @default(uuid())
   time String?
-  video String?
+  video    Video?    @relation(fields: [videoId], references: [id])
+  videoId  String? @default(uuid())
   list        Json?
   status    ContentSatus?
   createdAt DateTime @default(now())
@@ -57,7 +72,8 @@ model Article {
   picture     Picture?   @relation(fields: [pictureId], references: [id])
   pictureId   String?    @default(uuid())
   time String?
-  video String?
+  video    Video?    @relation(fields: [videoId], references: [id])
+  videoId  String? @default(uuid())
   list        Json?
   status    ContentSatus?
   createdAt DateTime @default(now())
@@ -98,7 +114,7 @@ model Portfolio {
   title     String? @db.VarChar(500)
   description   String? @db.VarChar(3000)
   categoryName String?
-  category    PortfolioCategory?    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category    Category?    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId  String? @default(uuid())
   picture    Picture?    @relation(fields: [pictureId], references: [id])
   pictureId  String? @default(uuid())
@@ -106,16 +122,6 @@ model Portfolio {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@map("portfolios")
-}
-
-model PortfolioCategory {
-  id    String     @default(uuid()) @id
-  title     String? @db.VarChar(500)
-  description   String? @db.VarChar(3000)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  portfolio Portfolio[]
-  @@map("portfolio_categories")
 }
 
 model Section {
@@ -126,15 +132,36 @@ model Section {
   status            ContentSatus?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
-  sectionArea SectionArea[]
+  ategory Category[]
   @@map("sections")
+}
+
+model Category {
+  id    String     @default(uuid()) @id
+  number            Int           @default(autoincrement())
+  title     String? @db.VarChar(500)
+  description   String? @db.VarChar(3000)
+  subtitle     String? @db.VarChar(500)
+  section    Section?    @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  sectionId  String? @default(uuid())
+  picture    Picture?    @relation(fields: [pictureId], references: [id])
+  pictureId  String? @default(uuid())
+  video    Video?    @relation(fields: [videoId], references: [id])
+  videoId  String? @default(uuid())
+  list        Json?
+  status            ContentSatus?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  portfolio Portfolio[]
+  categoryArea CategoryArea[]
+  @@map("categories")
 }
 
 model Area {
   id                String        @default(uuid()) @id
   number            Int           @default(autoincrement())
-  lat               String?       @db.VarChar(100)
-  lon               String?       @db.VarChar(100)
+  lat               Float?
+  lon               Float?
   name              String?       @db.VarChar(500)
   title             String?       @db.VarChar(500)
   description       String?       @db.VarChar(3000)
@@ -144,40 +171,37 @@ model Area {
   pictureId   String?    @default(uuid())
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
-  sectionArea SectionArea[]
+  categoryArea CategoryArea[]
   @@map("areas")
 }
 
-model SectionArea {
+model CategoryArea {
   id                String        @default(uuid()) @id
-  sectionId String  @default(uuid())
+  categoryId String  @default(uuid())
   areaId    String  @default(uuid())
-  section   Section  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  category   Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   area      Area     @relation(fields: [areaId], references: [id], onDelete: Cascade)
   status    ContentSatus?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   build             Build[]
-  @@map("section_area")
+  @@map("category_area")
 }
 
 model Build {
   id                String        @default(uuid()) @id
   number            Int           @default(autoincrement())
-  lat               String?       @db.VarChar(100)
-  lon               String?       @db.VarChar(100)
+  coordinates              Json?
   name              String?       @db.VarChar(500)
-  wPicture     Picture?   @relation("WPictureRelation", fields: [wPictureId], references: [id])
-  wPictureId   String?    @default(uuid())
-  wDescription       String?       @db.VarChar(3000)
-  gPicture     Picture?   @relation("GPictureRelation", fields: [gPictureId], references: [id])
-  gPictureId   String?    @default(uuid())
-  gTitle             String?       @db.VarChar(500)
-  gSubTitle             String?       @db.VarChar(500)
-  list        Json?
+  wDescription      String?       @db.VarChar(3000)
+  picture           Picture?   @relation(fields: [pictureId], references: [id])
+  pictureId         String?    @default(uuid())
+  gTitle            String?       @db.VarChar(500)
+  gSubTitle         String?       @db.VarChar(500)
+  list              Json?
   status            ContentSatus?
-  sectionAreaId    String?  @default(uuid())
-  sectionArea      SectionArea?     @relation(fields: [sectionAreaId], references: [id], onDelete: Cascade)
+  categoryAreaId     String?  @default(uuid())
+  categoryArea       CategoryArea?     @relation(fields: [categoryAreaId], references: [id], onDelete: Cascade)
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   @@map("builds")
@@ -188,7 +212,8 @@ model Feedback {
   number      Int        @default(autoincrement())
   title     String? @db.VarChar(500)
   description   String? @db.VarChar(3000)
-  video String?
+  video    Video?    @relation(fields: [videoId], references: [id])
+  videoId  String? @default(uuid())
   picture    Picture?    @relation(fields: [pictureId], references: [id])
   pictureId  String? @default(uuid())
   status    ContentSatus?

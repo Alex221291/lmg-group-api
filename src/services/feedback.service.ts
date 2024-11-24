@@ -25,7 +25,7 @@ export class FeedbackService {
       title: answer?.title,
       description: answer?.description,
       status: answer?.status,
-      video: answer?.video,
+      videoId: answer?.videoId,
       pictureId: answer?.pictureId,
     };
   }
@@ -42,7 +42,7 @@ export class FeedbackService {
         title: item?.title,
         description: item?.description,
         status: item?.status,
-        video: item?.video,
+        videoId: item?.videoId,
         pictureId: item?.pictureId,
       };
     })
@@ -51,7 +51,7 @@ export class FeedbackService {
   async create(fileInfo?: {path: string, name: string, type: string}, data?: CreateFeedbackDto): Promise<any> {
     const picture = await this.addPicture(fileInfo);
     return await this.prisma.feedback.create({
-      data :{...data, pictureId: picture?.id}
+      data :{...data, pictureId: picture?.id, videoId: null}
     });
   }
 
@@ -70,13 +70,7 @@ export class FeedbackService {
       where:{
         id: data.id,
       },
-      data: {
-        title: data?.title,
-        description: data?.description,
-        video: data?.video,
-        status: data?.status,
-        pictureId: picture?.id,
-      },
+      data :{...data, pictureId: picture?.id, videoId: null}
     });
   }
 

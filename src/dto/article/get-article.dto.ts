@@ -8,7 +8,7 @@ export interface GetArticleDto {
     subtitle?: string;
     pictureId?: string;
     time?: string;
-    video?: string;
+    videoId?: string;
     createdAt?: Date;
     updatedAt?: Date;
     list?: GetListDto[];

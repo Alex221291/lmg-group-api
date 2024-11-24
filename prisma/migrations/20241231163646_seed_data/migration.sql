@@ -1,9 +1,9 @@
--- Наполнение таблицы PortfolioCategory со статическими GUID и значениями полей createdAt и updatedAt
-INSERT INTO "portfolio_categories" ("id", "title", "description", "createdAt", "updatedAt") VALUES
-('02ecb690-db94-44f6-9e2c-7dc2d9dd6f47', 'Лифты', 'Описание для Лифты', now(), now()),
-('9a80818b-711b-4726-a264-3dac05f438b4', 'Бизнес-центры', 'Описание для Бизнес-центры', now(), now()),
-('9f01c16d-d45c-4cf7-90ad-976c687896cb', 'Жилые комплексы', 'Описание для Жилые комплексы', now(), now()),
-('5df55d69-18e2-4b44-9daf-7575783a83f4', 'Реклама на двери', 'Описание для Реклама на двери', now(), now());
+-- -- Наполнение таблицы PortfolioCategory со статическими GUID и значениями полей createdAt и updatedAt
+-- INSERT INTO "portfolio_categories" ("id", "title", "description", "createdAt", "updatedAt") VALUES
+-- ('02ecb690-db94-44f6-9e2c-7dc2d9dd6f47', 'Лифты', 'Описание для Лифты', now(), now()),
+-- ('9a80818b-711b-4726-a264-3dac05f438b4', 'Бизнес-центры', 'Описание для Бизнес-центры', now(), now()),
+-- ('9f01c16d-d45c-4cf7-90ad-976c687896cb', 'Жилые комплексы', 'Описание для Жилые комплексы', now(), now()),
+-- ('5df55d69-18e2-4b44-9daf-7575783a83f4', 'Реклама на двери', 'Описание для Реклама на двери', now(), now());
 
 -- Вставка данных в таблицу Picture
 INSERT INTO "pictures" ("id", "name", "type", "picture", "createdAt", "updatedAt") VALUES 
@@ -11,8 +11,8 @@ INSERT INTO "pictures" ("id", "name", "type", "picture", "createdAt", "updatedAt
 ('b486a497-82aa-419a-9921-b3a567fff653', 'news-1-1.png', 'image/png', null, now(), now()),
 ('382a4a5c-8555-4329-ab6e-3212d9aafdc0', 'news-1-2.png', 'image/png', null, now(), now());
 -- Вставка данных в таблицу News
-INSERT INTO "news" ("id", "title", "subtitle", "time", "video", "status", "pictureId", "createdAt", "updatedAt") VALUES 
-('8f1fc584-faf7-470c-b07c-66ee74c393fc', 'Реклама для ПВЗ:', 'Увеличьте Присутствие Вашего Бренда в Местах Получения Заказов', '5 мин.', null, 'PUBLISHED', 'c4e9ff9a-87e8-40f1-a4e3-ce46060eec12', now(), now());
+INSERT INTO "news" ("id", "title", "subtitle", "time", "status", "pictureId", "createdAt", "updatedAt") VALUES 
+('8f1fc584-faf7-470c-b07c-66ee74c393fc', 'Реклама для ПВЗ:', 'Увеличьте Присутствие Вашего Бренда в Местах Получения Заказов', '5 мин.', 'PUBLISHED', 'c4e9ff9a-87e8-40f1-a4e3-ce46060eec12', now(), now());
 
 -- Вставка данных в таблицу NewsItem
 INSERT INTO "news_items" ("id", "text", "pictureId", "newsId", "list", "createdAt", "updatedAt") VALUES 
@@ -27,8 +27,8 @@ INSERT INTO "pictures" ("id", "name", "type", "picture", "createdAt", "updatedAt
 ('8f884398-68c5-470a-ba4d-21af963f748e', 'article-1-1.png', 'image/png', null, now(), now());
 
 -- Вставка данных в таблицу Article
-INSERT INTO "articles" ("id", "title", "subtitle", "time", "video", "status", "pictureId", "createdAt", "updatedAt") VALUES 
-('19f1749c-b9b3-4c13-a183-0ea9c013830d', 'Закон о рекламе:', 'Основные положения и правила', '5 мин.', null, 'PUBLISHED', 'b924e9dc-8674-41f0-9166-de5c609c2d7b', now(), now());
+INSERT INTO "articles" ("id", "title", "subtitle", "time", "status", "pictureId", "createdAt", "updatedAt") VALUES 
+('19f1749c-b9b3-4c13-a183-0ea9c013830d', 'Закон о рекламе:', 'Основные положения и правила', '5 мин.', 'PUBLISHED', 'b924e9dc-8674-41f0-9166-de5c609c2d7b', now(), now());
 
 -- Вставка данных в таблицу ArticleItem
 INSERT INTO "article_items" ("id", "text", "pictureId", "articleId", "list", "createdAt", "updatedAt") VALUES 

@@ -1,34 +1,34 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
-import {  } from '@prisma/client';
-import { Prisma } from '@prisma/client';
-import { SectionService } from 'src/services/section.service';
+import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import { SectionService } from '../services/section.service';
+import { CreateSectionDto } from '../dto/section/create-section.dto';
+import { GetSectionDto } from 'src/dto/section/get-section.dto';
 
 @Controller('section')
 export class SectionController {
-  constructor(private sectionService: SectionService) {}
+  constructor(private readonly sectionsService: SectionService) {}
 
-  @Get(':id')
-  getById(@Param('id') id: string): Promise< | null> {
-    return this.sectionService.getById(id);
+  @Post()
+  create(@Body() data: CreateSectionDto) {
+    return this.sectionsService.create(data);
   }
 
   @Get()
-  getAllWithArea(@Param('id') id: string): Promise< | null> {
-    return this.sectionService.getAllWithArea();
+  findAll(): Promise<GetSectionDto[]> {
+    return this.sectionsService.findAll();
   }
 
-  @Post()
-  create(@Body() data: any): Promise<any> {
-    return this.sectionService.create(data);
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.sectionsService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() data: any): Promise<any> {
-    return this.sectionService.update(id, data);
+  update(@Param('id') id: string, @Body() data: CreateSectionDto) {
+    return this.sectionsService.update(id, data);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string): Promise<any> {
-    return this.sectionService.delete(id);
+  remove(@Param('id') id: string) {
+    return this.sectionsService.remove(id);
   }
 }

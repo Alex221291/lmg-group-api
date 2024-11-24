@@ -8,4 +8,5 @@ export interface GetFeedbackDto {
     video?: string;
     status: $Enums.ContentSatus;
     pictureId?: string;
+    videoId?: string;
 }

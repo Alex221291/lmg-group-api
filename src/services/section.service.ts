@@ -1,46 +1,29 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
-import { Prisma } from '@prisma/client';
+import { CreateSectionDto } from '../dto/section/create-section.dto';
+import { GetSectionDto } from 'src/dto/section/get-section.dto';
 
 @Injectable()
 export class SectionService {
   constructor(private prisma: PrismaService) {}
 
-  async getAllWithArea(): Promise< any | null> {
-    return this.prisma.section.findMany({
-      include: {
-        sectionArea:{
-          include:{
-            area:{
-            }
-          }
-        }
-      }
-    });
+  create(data: CreateSectionDto) {
+    return this.prisma.section.create({ data });
   }
 
-  async getById(id: string): Promise< any | null> {
-    return this.prisma.section.findUnique({
-      where: { id },
-    });
+  findAll():Promise<GetSectionDto[] | []> {
+    return this.prisma.section.findMany();
   }
 
-  async create(data: any): Promise<any> {
-    return this.prisma.section.create({
-      data,
-    });
+  findOne(id: string) {
+    return this.prisma.section.findUnique({ where: { id } });
   }
 
-  async update(id: string, data: any): Promise<any> {
-    return this.prisma.section.update({
-      where: { id },
-      data,
-    });
+  update(id: string, data: CreateSectionDto) {
+    return this.prisma.section.update({ where: { id }, data });
   }
 
-  async delete(id: string): Promise<any> {
-    return this.prisma.section.delete({
-      where: { id },
-    });
+  remove(id: string) {
+    return this.prisma.section.delete({ where: { id } });
   }
 }
