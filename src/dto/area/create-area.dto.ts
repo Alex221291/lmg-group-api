@@ -1,8 +1,8 @@
+import { $Enums } from "@prisma/client";
+
 export class CreateAreaDto {
   lat?: number;
   lon?: number;
   name?: string;
-  title?: string;
-  description?: string;
-  subTitle?: string;
+  status?: $Enums.ContentSatus
 }

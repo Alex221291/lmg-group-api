@@ -1,6 +1,6 @@
 import { $Enums } from '@prisma/client';
 
-export class CreateCategoryDto {
+export interface CreateCategoryDto {
   title?: string;
   description?: string;
   subtitle?: string;

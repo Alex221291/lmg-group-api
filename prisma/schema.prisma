@@ -25,7 +25,7 @@ model Picture {
   portfolio Portfolio[]
   news News[]
   article Article[]
-  Area Area[]
+  categoryArea CategoryArea[]
   builds Build[]
   feedback Feedback[]
   category Category[]
@@ -163,12 +163,7 @@ model Area {
   lat               Float?
   lon               Float?
   name              String?       @db.VarChar(500)
-  title             String?       @db.VarChar(500)
-  description       String?       @db.VarChar(3000)
-  subTitle          String?       @db.VarChar(500)
   status            ContentSatus?
-  picture     Picture?   @relation(fields: [pictureId], references: [id])
-  pictureId   String?    @default(uuid())
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   categoryArea CategoryArea[]
@@ -181,7 +176,12 @@ model CategoryArea {
   areaId    String  @default(uuid())
   category   Category  @relation(fields: [categoryId], references: [id])
   area      Area     @relation(fields: [areaId], references: [id])
+  title             String?       @db.VarChar(500)
+  description       String?       @db.VarChar(3000)
+  subTitle          String?       @db.VarChar(500)
   status    ContentSatus?
+  picture     Picture?   @relation(fields: [pictureId], references: [id])
+  pictureId   String?    @default(uuid())
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   build             Build[]
