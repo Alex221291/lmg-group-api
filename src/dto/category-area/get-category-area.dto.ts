@@ -21,5 +21,15 @@ export interface GetCategoryAreaDto {
       createdAt: Date;
       updatedAt: Date;
     };
+    build: {
+      id: string;
+      name?: string;
+      coordiantes: [number, number][];
+      list?: {title?:string, value?: string}[];
+    }[];
+    list?: {
+      title?: string;
+      value?: string;
+    }[];
   }
   

@@ -5,25 +5,108 @@ import { UpdateCategoryAreaDto } from 'src/dto/category-area/update-category-are
 import { UpdateCategoryAreaStatusDto } from 'src/dto/category-area/update-category-area-status.dto';
 import { FileService } from './file.service';
 import { createReadStream } from 'fs';
+import { buildMessage } from 'class-validator';
+import { GetCategoryAreaDto } from 'src/dto/category-area/get-category-area.dto';
 
 @Injectable()
 export class CategoryAreaService {
   constructor(private prisma: PrismaService,  
     private fileService: FileService) {}
 
-  async findAll(categoryId?: string) {
-    let params: any = {
-      include: {
-        area: {},
-      },
-      orderBy: {
-        createdAt: 'asc',
+  async findAllold(categoryId?: string): Promise<any> { //GetCategoryAreaDto[]
+      let params: any = {
+        include: {
+          area: {},
+          build: {
+            select: {
+              id: true,
+              name: true,
+              coordinates: true,
+              list: true
+            }
+          }
+        },
+        orderBy: {
+          createdAt: 'asc',
+        }
+      };
+      if (categoryId) {
+        params = { ...params, where: { categoryId } };
       }
-    };
-    if(categoryId){
-      params = {...params, where:{categoryId}};
-    }
-    return await this.prisma.categoryArea.findMany(params);
+      
+      let result : any[] = await this.prisma.categoryArea.findMany(params);
+
+      return result?.map(item => {
+          // Группировка и суммирование значений list из build
+          const parseList = item?.build?.list ? JSON.parse(item?.build?.list as unknown as string) : [];
+          console.log(parseList);
+          const groupedList = parseList?.reduce((acc, curr) => {
+              if (!acc[curr.title]) {
+                  acc[curr.title] = { title: curr.title, value: 0 };
+              }
+              acc[curr.title].value += parseFloat(curr.value) || 0;
+              return acc;
+          }, {});
+
+          console.log(groupedList);
+          const summedList = Object.values(groupedList);
+
+          return {
+              ...item,
+              list: summedList
+          };
+      });
+  }
+
+    async findAll(categoryId?: string): Promise<GetCategoryAreaDto[]> {
+      let params: any = {
+          include: {
+              area: {},
+              build: {
+                  select: {
+                      id: true,
+                      name: true,
+                      coordinates: true,
+                      list: true
+                  }
+              }
+          },
+          orderBy: {
+              createdAt: 'asc',
+          }
+      };
+      
+      if (categoryId) {
+          params = { ...params, where: { categoryId } };
+      }
+
+      let result : any[] = await this.prisma.categoryArea.findMany(params);
+
+      return result?.map(item => {
+          // Объединение и суммирование значений list из всех build
+          const combinedList = item.build?.reduce((acc, buildItem) => {
+            const parseList = buildItem?.list ? JSON.parse(buildItem?.list as unknown as string) : [];
+              if (parseList) {
+                parseList?.forEach(curr => {
+                      if (curr.title) {
+                          if (!acc[curr.title]) {
+                              acc[curr.title] = { title: curr.title, value: 0 };
+                          }
+                          acc[curr.title].value += parseFloat(curr.value) || 0;
+                      }
+                  });
+              }
+              return acc;
+          }, {});
+
+          // Преобразование combinedList в массив
+          const summedList = Object.values(combinedList);
+
+          return {
+              ...item,
+              list: summedList
+          };
+      });
   }
 
   async findOne(id: string) {
