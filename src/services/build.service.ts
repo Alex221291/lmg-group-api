@@ -67,7 +67,7 @@ export class BuildService {
           gTitle: data?.gTitle,
           gSubTitle: data?.gSubTitle,
           status: data?.status,
-          coordinates: data?.list ? JSON.stringify(data.coordinates) : undefined,
+          coordinates: data?.coordinates ? JSON.stringify(data.coordinates) : undefined,
           list: data?.list ? JSON.stringify(data.list) : undefined,
           pictureId: picture?.id || null,
         }
@@ -92,7 +92,7 @@ export class BuildService {
           gTitle: data?.gTitle,
           gSubTitle: data?.gSubTitle,
           status: data?.status,
-          coordinates: data?.list ? JSON.stringify(data.coordinates) : undefined,
+          coordinates: data?.coordinates ? JSON.stringify(data.coordinates) : undefined,
           list: data?.list ? JSON.stringify(data.list) : undefined,
           pictureId: picture?.id || null,
         }
