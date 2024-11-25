@@ -1,6 +1,7 @@
 import { $Enums } from "@prisma/client";
 
-export interface CreateBuildDto {
+export interface UpdateBuildDto {
+  id: string;
   coordinates?: [number, number][];
   name?: string;
   wDescription?: string;
