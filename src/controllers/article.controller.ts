@@ -9,7 +9,7 @@ import {
   UploadedFiles,
   Put,
 } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateArticleDto } from 'src/dto/article/create-article.dto';
 import { GetArticleDto } from 'src/dto/article/get-article.dto';
@@ -25,28 +25,46 @@ export class ArticleController {
   ) {}
 
   @Post('create')
-  @UseInterceptors(FilesInterceptor('files[]'))
-  async createArticle(@UploadedFiles() files: Express.Multer.File[], @Body() data: CreateArticleDto): Promise<GetArticleDto | null> {
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'files'},
+      { name: 'video', maxCount: 1 },
+    ]),
+  )
+  async createArticle(@UploadedFiles() files: { files?: Express.Multer.File[]; video?: Express.Multer.File[] },
+  @Body() data: CreateArticleDto): Promise<GetArticleDto | null> {
     if(data?.contentItems){
       data.contentItems = typeof data.contentItems === 'string' ? JSON.parse(data.contentItems) : data.contentItems;
     }
     if(data?.list){
       data.list = typeof data.list === 'string' ? JSON.parse(data.list) : data.list;
     }
-    
-    const filesInfo = files?.map(file => {
+    console.log(files);
+    const video = files?.video ? files?.video[0] : null;
+    const filesInfo = files?.files?.map(file => {
       return {
         path: file?.path,
         name: file?.originalname,
         type: file?.mimetype
       }
     });
-    return await this.articleService.createArticle(filesInfo, data);
+    const videoInfo = {
+      path: video?.path,
+      filename: video?.filename,
+      originalname: video?.originalname,
+    };
+    return await this.articleService.createArticle(filesInfo, videoInfo, data);
   }
 
   @Post('update')
-  @UseInterceptors(FilesInterceptor('files[]'))
-  async updateArticle(@UploadedFiles() files: Express.Multer.File[], @Body() data: UpdateArticleDto): Promise<GetArticleDto | null> {
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'files'},
+      { name: 'video', maxCount: 1 },
+    ]),
+  )
+  async updateArticle(@UploadedFiles() files: { files?: Express.Multer.File[]; video?: Express.Multer.File[] },
+   @Body() data: UpdateArticleDto): Promise<GetArticleDto | null> {
     if(data?.contentItems){
       data.contentItems = typeof data.contentItems === 'string' ? JSON.parse(data.contentItems) : data.contentItems;
     }
@@ -54,14 +72,20 @@ export class ArticleController {
       data.list = typeof data.list === 'string' ? JSON.parse(data.list) : data.list;
     }
 
-    const filesInfo = files?.map(file => {
+    const filesInfo = files?.files?.map(file => {
       return {
         path: file?.path,
         name: file?.originalname,
         type: file?.mimetype
       }
     });
-    const result = await this.articleService.updateArticle(filesInfo, data);
+    const video = files?.video ? files?.video[0] : null;
+    const videoInfo = {
+      path: video?.path,
+      filename: video?.filename,
+      originalname: video?.originalname,
+    };
+    const result = await this.articleService.updateArticle(filesInfo, videoInfo, data);
     return result;
   }
 

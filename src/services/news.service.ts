@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from './prisma.service';
 import { GetNewsDto } from '../dto/news/get-news.dto';
-import { $Enums, News, Picture } from '@prisma/client';
+import { $Enums, Picture } from '@prisma/client';
 import { CreateNewsDto } from '../dto/news/create-news.dto';
 import { createReadStream } from 'fs';
 import { FileService } from './file.service';
@@ -85,17 +85,17 @@ export class NewsService {
     })
   }
 
-  async createNews(filesInfo?: {path: string, name: string, type: string}[], data?: CreateNewsDto): Promise<GetNewsDto> {
-    const mainFile = filesInfo.find(f => data.pictureName && data.pictureName !== null && f.name === data.pictureName) || null;
+  async createNews(filesInfo?: {path?: string, name?: string, type?: string}[], videoInfo?: {filename?: string, originalname?: string, path?: string}, data?: CreateNewsDto): Promise<GetNewsDto> {
+    const mainFile = filesInfo?.find(f => data.pictureName && data.pictureName !== null && f.name === data.pictureName) || null;
     const mainPicture = await this.addPicture(mainFile);
-
+    const video = await this.addVideo(videoInfo);
     const news = await this.prisma.news.create({
       data: {
         title: data?.title,
         subtitle: data?.subtitle,
         status: data?.status ?? $Enums.ContentSatus.DRAFT,
         time: data?.time,
-        videoId: null, //TODO
+        videoId: video?.id || null,
         list: data?.list ? JSON.stringify(data.list) : undefined,
         pictureId: mainPicture?.id || null,
       },
@@ -109,7 +109,7 @@ export class NewsService {
     for (const item of data?.contentItems) {
       let picture: Picture;
       if (item?.pictureName) {
-        const file = filesInfo.find(f => f.name === item?.pictureName);
+        const file = filesInfo?.find(f => f.name === item?.pictureName);
         picture = await this.addPicture(file);
       }
       await this.prisma.newsItem.create({
@@ -124,15 +124,20 @@ export class NewsService {
     return await this.getById(news.id);
   }
 
-  async updateNews(filesInfo?: {path: string, name: string, type: string}[], data?: UpdateNewsDto): Promise<GetNewsDto> {
+  async updateNews(filesInfo?: {path?: string, name?: string, type?: string}[], videoInfo?: {filename?: string, originalname?: string, path?: string}, data?: UpdateNewsDto): Promise<GetNewsDto> {
 
     const currentNews = await this.getById(data?.id);
     if(!currentNews) return null;
 
     await this.prisma.picture.deleteMany({where: {id: currentNews?.pictureId || ''}});
-    const mainFile = filesInfo.find(f => data.pictureName && data.pictureName !== null && f.name === data.pictureName) || null;
+    const mainFile = filesInfo?.find(f => data.pictureName && data.pictureName !== null && f.name === data.pictureName) || null;
     const mainPicture = await this.addPicture(mainFile);
-
+    const video = await this.addVideo(videoInfo);
+    await this.prisma.video.deleteMany({
+      where : {
+        id: currentNews?.videoId || ''
+      }
+    });
     const updateNews = await this.prisma.news.update({
       where:{
         id: data.id,
@@ -142,7 +147,7 @@ export class NewsService {
         subtitle: data?.subtitle,
         status: data?.status ?? $Enums.ContentSatus.DRAFT,
         time: data?.time,
-        videoId: null, //TODO
+        videoId: video?.id || null,
         list: data?.list ? JSON.stringify(data.list) : undefined,
         pictureId: mainPicture?.id || null,
       },
@@ -158,7 +163,7 @@ export class NewsService {
     for (const item of data?.contentItems) {
       let picture: Picture;
       if (item?.pictureName) {
-        const file = filesInfo.find(f => f.name == item?.pictureName);
+        const file = filesInfo?.find(f => f.name == item?.pictureName);
         picture = await this.addPicture(file);
       }
       await this.prisma.newsItem.create({
@@ -195,7 +200,7 @@ export class NewsService {
     return await this.getById(currentNews.id);
   }
 
-  private async addPicture(file?: {path: string, name: string, type: string}){
+  private async addPicture(file?: {path?: string, name?: string, type?: string}){
     let fileData: Buffer;
     let picture;
 
@@ -215,7 +220,19 @@ export class NewsService {
           type: file.type || 'image/png',
         },
       });
+
     }
+    console.log(picture);
     return picture || null;
+  }
+
+  private async addVideo(videoInfo?: {filename?: string, originalname?: string, path?: string}){
+    let video;
+    if(videoInfo?.path){
+      video = await this.prisma.video.create({
+        data: videoInfo,
+      });
+    }
+    return video || null;
   }
 }
