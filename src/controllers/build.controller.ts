@@ -26,7 +26,7 @@ export class BuildController {
       data.list = typeof data.list === 'string' ? JSON.parse(data.list) : data.list;
     };
     if(data?.coordinates){
-      data.coordinates = typeof data.coordinates === 'string' ? JSON.parse(data.coordinates) : data.list;
+      data.coordinates = typeof data.coordinates === 'string' ? JSON.parse(data.coordinates) : data.coordinates;
     };
     
     return await this.buildService.create({path: file?.path, type: file?.mimetype, name:file?.originalname}, data);
@@ -39,7 +39,7 @@ export class BuildController {
       data.list = typeof data.list === 'string' ? JSON.parse(data.list) : data.list;
     };
     if(data?.coordinates){
-      data.coordinates = typeof data.coordinates === 'string' ? JSON.parse(data.coordinates) : data.list;
+      data.coordinates = typeof data.coordinates === 'string' ? JSON.parse(data.coordinates) : data.coordinates;
     };
     
     return await this.buildService.update({path: file?.path, type: file?.mimetype, name:file?.originalname}, data);

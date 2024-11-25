@@ -6,18 +6,10 @@ import { Video } from '@prisma/client';
 export class VideoService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async addVideo(videoId?: string, data?: {originalname: string, filename: string, path:string}) : Promise<Video | null> {
-    // if(!videoId && !data) return null;
-    // if(videoId && !data) {
-    //     await this.prisma.video.deleteMany()
-    // }
-    const video = await this.prisma.video.create({
-      data: {
-        originalname: data.originalname,
-        filename: data.filename,
-        path: data.path,
-      },
+  async getVideo(id: string) : Promise<Video | null> {
+    const video = await this.prisma.video.findUnique({
+      where: {id},
     });
-    return video;
+    return video || null;
   }
 }
