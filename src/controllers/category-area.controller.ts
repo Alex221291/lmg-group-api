@@ -1,16 +1,13 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, Query, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { CategoryAreaService } from '../services/category-area.service';
 import { CreateCategoryAreaDto } from '../dto/category-area/create-category-area.dto';
 import { UpdateCategoryAreaStatusDto } from 'src/dto/category-area/update-category-area-status.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdateCategoryAreaDto } from 'src/dto/category-area/update-category-area.dto';
 
 @Controller('category-area')
 export class CategoryAreaController {
   constructor(private readonly categoryAreaService: CategoryAreaService) {}
-
-  @Post('create')
-  async create(@Body() data: CreateCategoryAreaDto) {
-    return await this.categoryAreaService.create(data);
-  }
 
   @Get()
   async findAll(@Query('categoryId') categoryId: string) {
@@ -23,8 +20,15 @@ export class CategoryAreaController {
   }
 
   @Post('create')
-  async update(@Body() data: CreateCategoryAreaDto) {
-    return await this.categoryAreaService.update(data);
+  @UseInterceptors(FileInterceptor('file'))
+  async create(@UploadedFile() file: Express.Multer.File, @Body() data: CreateCategoryAreaDto) {
+    return await this.categoryAreaService.create({path: file?.path, type: file?.mimetype, name:file?.originalname}, data);
+  }
+
+  @Post('update')
+  @UseInterceptors(FileInterceptor('file'))
+  async update(@UploadedFile() file: Express.Multer.File, @Body() data: UpdateCategoryAreaDto) {
+    return await this.categoryAreaService.update({path: file?.path, type: file?.mimetype, name:file?.originalname}, data);
   }
 
   @Delete(':id')

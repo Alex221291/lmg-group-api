@@ -4,19 +4,19 @@ export interface GetCategoryAreaDto {
     id: string;
     categoryId: string;
     areaId: string;
-    title: string;
-    description: string;
-    subTitle: string;
-    pictureId: string | null;
-    status: $Enums.ContentSatus;
+    title?: string;
+    description?: string;
+    subTitle?: string;
+    pictureId?: string | null;
+    status?: $Enums.ContentSatus;
     createdAt: Date;
     updatedAt: Date;
     area: {
       id: string;
       number: number;
-      lat: number;
-      lon: number;
-      name: string;
+      lat?: number;
+      lon?: number;
+      name?: string;
       status?: $Enums.ContentSatus;
       createdAt: Date;
       updatedAt: Date;
