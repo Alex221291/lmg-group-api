@@ -14,7 +14,7 @@ export class SectionController {
 
   @Get()
   async findAll(): Promise<GetSectionDto[]> {
-    return await this.sectionsService.findAll();
+    return await this.sectionsService.getAllMaps();
   }
 
   @Get(':id')

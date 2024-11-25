@@ -112,4 +112,89 @@ export class SectionService {
   
       return result;
   }
+
+  async getAllMaps(): Promise<GetSectionMapDto[]> {
+    const sections = await this.prisma.section.findMany({
+        include: {
+            ategory: {
+                include: {
+                    categoryArea: {
+                        include: {
+                            build: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    coordinates: true,
+                                    list: true,
+                                    categoryAreaId: true
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    const result: GetSectionMapDto[] = sections.map(section => {
+        const sectionDto: GetSectionMapDto = {
+            id: section.id,
+            number: section.number,
+            title: section.title,
+            description: section.description,
+            status: section.status,
+            createdAt: section.createdAt,
+            updatedAt: section.updatedAt,
+            build: [],
+            list: []
+        };
+
+        // Объединение всех build из categoryArea
+        section.ategory.forEach(cat => {
+            cat.categoryArea.forEach(area => {
+                area.build.forEach(buildItem => {
+                    // Распарсить coordinates
+                    const parsedCoordinates = JSON.parse(buildItem.coordinates as string) as [number, number][];
+                    buildItem.coordinates = parsedCoordinates;
+
+                    // Распарсить list
+                    const parsedList = JSON.parse(buildItem.list as string) as { title: string; value: string }[];
+                    buildItem.list = parsedList;
+
+                    sectionDto.build.push({
+                      id: buildItem.id,
+                      name: buildItem?.name,
+                      categoryAreaId: buildItem?.categoryAreaId,
+                      coordinates: parsedCoordinates,
+                      list: parsedList,
+                      categoryId: cat.id
+                    });
+                });
+            });
+        });
+
+        // Объединение и суммирование значений list из всех build
+        const combinedList = sectionDto.build.reduce((acc, buildItem) => {
+            if (buildItem.list) {
+                buildItem.list.forEach(curr => {
+                    if (curr.title) {
+                        if (!acc[curr.title]) {
+                            acc[curr.title] = { title: curr.title, value: 0 };
+                        }
+                        acc[curr.title].value += parseFloat(curr.value) || 0;
+                    }
+                });
+            }
+            return acc;
+        }, {});
+
+        // Преобразование combinedList в массив
+        sectionDto.list = Object.values(combinedList);
+
+        return sectionDto;
+    });
+
+    return result;
+  }
+
 }
