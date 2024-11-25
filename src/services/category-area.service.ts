@@ -84,20 +84,22 @@ export class CategoryAreaService {
 
       return result?.map(item => {
           // Объединение и суммирование значений list из всех build
-          const combinedList = item.build?.reduce((acc, buildItem) => {
-            const parseList = buildItem?.list ? JSON.parse(buildItem?.list as unknown as string) : [];
-              if (parseList) {
-                parseList?.forEach(curr => {
-                      if (curr.title) {
-                          if (!acc[curr.title]) {
-                              acc[curr.title] = { title: curr.title, value: 0 };
-                          }
-                          acc[curr.title].value += parseFloat(curr.value) || 0;
+        const combinedList = item.build?.reduce((acc, buildItem) => {
+          const parseList = buildItem?.list ? JSON.parse(buildItem?.list as unknown as string) : [];
+          if(buildItem?.list) buildItem.list = parseList;
+          if(buildItem?.coordinates) buildItem.coordinates = buildItem?.coordinates ? JSON.parse(buildItem?.coordinates as unknown as string) : [];
+          if (parseList) {
+            parseList?.forEach(curr => {
+                  if (curr.title) {
+                      if (!acc[curr.title]) {
+                          acc[curr.title] = { title: curr.title, value: 0 };
                       }
-                  });
-              }
-              return acc;
-          }, {});
+                      acc[curr.title].value += parseFloat(curr.value) || 0;
+                  }
+              });
+          }
+          return acc;
+        }, {});
 
           // Преобразование combinedList в массив
           const summedList = Object.values(combinedList);

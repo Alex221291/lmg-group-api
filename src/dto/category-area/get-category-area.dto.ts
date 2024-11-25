@@ -24,7 +24,7 @@ export interface GetCategoryAreaDto {
     build: {
       id: string;
       name?: string;
-      coordiantes: [number, number][];
+      coordinates: [number, number][];
       list?: {title?:string, value?: string}[];
     }[];
     list?: {
