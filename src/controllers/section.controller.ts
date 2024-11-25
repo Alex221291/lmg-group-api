@@ -31,4 +31,9 @@ export class SectionController {
   async remove(@Param('id') id: string) {
     return await this.sectionsService.remove(id);
   }
+
+  @Get('map/:id')
+  async getMap(@Param('id') id: string) {
+    return await this.sectionsService.getMap(id);
+  }
 }
