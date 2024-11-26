@@ -18,14 +18,10 @@ import { MailService } from '../services/mail.service';
     @Post()
     async get(@Body() data: PostMailDto): Promise<any> {
       try {
-        const text = `name: ${data?.name}
-phone: ${data?.phone}
-email: ${data?.email}
-question: ${data?.question}`;
+        const text = `Имя: ${data?.name}
+Телефон: ${data?.phone}`;
 
-        await this.mailService.sendMail(data?.email, 'Вы задали вопрос', text);
-        await this.mailService.sendMail(process.env.MAIN_EMAIL, 'Вопрос клиента', text);
-
+        await this.mailService.sendMail(process.env.MAIN_EMAIL, 'Форма для связи', text);
         return;
       } catch (error) {
         throw new Error('Ошибка при Отправке сообщения');
