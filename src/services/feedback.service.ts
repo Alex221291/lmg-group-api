@@ -63,24 +63,24 @@ export class FeedbackService {
 
     const picture = await this.addPicture(fileInfo);
 
-    const video = await this.addVideo(videoInfo);
+    let videoId = data?.videoId;
 
-    await this.prisma.picture.deleteMany({
-      where : {
-        id: updateItem?.pictureId || ''
-      }
-    });
-    await this.prisma.video.deleteMany({
-      where : {
-        id: updateItem?.videoId || ''
-      }
-    });
+    if(!videoId)
+    {
+      const video = await this.addVideo(videoInfo);
+      videoId = video?.id;
+      await this.prisma.video.deleteMany({
+        where : {
+          id: updateItem?.videoId || ''
+        }
+      });
+    }
     
     return await this.prisma.feedback.update({
       where:{
         id: data.id,
       },
-      data :{...data, pictureId: picture?.id || null, videoId: video?.id || null}
+      data :{...data, pictureId: picture?.id || null, videoId: videoId || null}
     });
   }
 

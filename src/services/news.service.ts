@@ -132,12 +132,17 @@ export class NewsService {
     await this.prisma.picture.deleteMany({where: {id: currentNews?.pictureId || ''}});
     const mainFile = filesInfo?.find(f => data.pictureName && data.pictureName !== null && f.name === data.pictureName) || null;
     const mainPicture = await this.addPicture(mainFile);
-    const video = await this.addVideo(videoInfo);
-    await this.prisma.video.deleteMany({
-      where : {
-        id: currentNews?.videoId || ''
-      }
-    });
+    let videoId = data?.videoId;
+    if(!videoId)
+    {
+      const video = await this.addVideo(videoInfo);
+      videoId = video?.id;
+      await this.prisma.video.deleteMany({
+        where : {
+          id: currentNews?.videoId || ''
+        }
+      });
+    }
     const updateNews = await this.prisma.news.update({
       where:{
         id: data.id,
@@ -147,7 +152,7 @@ export class NewsService {
         subtitle: data?.subtitle,
         status: data?.status ?? $Enums.ContentSatus.DRAFT,
         time: data?.time,
-        videoId: video?.id || null,
+        videoId: videoId || null,
         list: data?.list ? JSON.stringify(data.list) : undefined,
         pictureId: mainPicture?.id || null,
       },

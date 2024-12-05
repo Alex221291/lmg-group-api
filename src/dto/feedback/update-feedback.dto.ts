@@ -4,5 +4,6 @@ export interface UpdateFeedbackDto {
     id: string;
     title?: string;
     description?: string;
+    videoId?: string;
     status: $Enums.ContentSatus;
 }

@@ -125,7 +125,6 @@ export class ArticleService {
   }
 
   async updateArticle(filesInfo?: {path?: string, name?: string, type?: string}[], videoInfo?: {filename?: string, originalname?: string, path?: string}, data?: UpdateArticleDto): Promise<GetArticleDto> {
-
     const currentArticle = await this.getById(data?.id);
     if(!currentArticle) return null;;
 
@@ -133,12 +132,17 @@ export class ArticleService {
     const mainFile = filesInfo?.find(f => data.pictureName && data.pictureName !== null && f.name === data.pictureName) || null;
     
     const mainPicture = await this.addPicture(mainFile);
-    const video = await this.addVideo(videoInfo);
-    await this.prisma.video.deleteMany({
-      where : {
-        id: currentArticle?.videoId || ''
-      }
-    });
+    let videoId = data?.videoId;
+    if(!videoId)
+    {
+      const video = await this.addVideo(videoInfo);
+      videoId = video?.id;
+      await this.prisma.video.deleteMany({
+        where : {
+          id: currentArticle?.videoId || ''
+        }
+      });
+    }
     
     const updateArticle = await this.prisma.article.update({
       where:{
@@ -149,7 +153,7 @@ export class ArticleService {
         subtitle: data?.subtitle,
         status: data?.status ?? $Enums.ContentSatus.DRAFT,
         time: data?.time,
-        videoId: video?.id || null,
+        videoId: videoId || null,
         list: data?.list ? JSON.stringify(data.list) : undefined,
         pictureId: mainPicture?.id || null,
       },

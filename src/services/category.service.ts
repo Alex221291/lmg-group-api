@@ -84,18 +84,17 @@ export class CategoryService {
     const updateItem = await this.getById(data?.id);
 
     const picture = await this.addPicture(fileInfo);
-    const video = await this.addVideo(videoInfo);
-
-    await this.prisma.picture.deleteMany({
-      where : {
-        id: updateItem?.pictureId || ''
-      }
-    });
-    await this.prisma.video.deleteMany({
-      where : {
-        id: updateItem?.videoId || ''
-      }
-    });
+    let videoId = data?.videoId;
+    if(!videoId)
+    {
+      const video = await this.addVideo(videoInfo);
+      videoId = video?.id;
+      await this.prisma.video.deleteMany({
+        where : {
+          id: updateItem?.videoId || ''
+        }
+      });
+    }
     
     return await this.prisma.category.update({
       where:{
@@ -109,7 +108,7 @@ export class CategoryService {
         list: data?.list ? JSON.stringify(data.list) : undefined,
         status: data?.status,
         pictureId: picture?.id || null,
-        videoId: video?.id || null,
+        videoId: videoId || null,
       },
     });
   }

@@ -10,6 +10,7 @@ export interface UpdateArticleDto {
     time?: string;
     list?: ListDto[];
     status: $Enums.ContentSatus;
+    videoId?: string;
     contentItems?: ItemDto[];
 }
 

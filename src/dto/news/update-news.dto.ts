@@ -8,6 +8,7 @@ export interface UpdateNewsDto {
     subtitle?: string;
     pictureName?: string;
     time?: string;
+    videoId?: string;
     list?: ListDto[];
     status: $Enums.ContentSatus;
     contentItems?: ItemDto[];
