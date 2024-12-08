@@ -7,6 +7,7 @@ export interface UpdateArticleDto {
     title?: string;
     subtitle?: string;
     pictureName?: string;
+    pictureId?: string;
     time?: string;
     list?: ListDto[];
     status: $Enums.ContentSatus;

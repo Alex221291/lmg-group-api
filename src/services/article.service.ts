@@ -128,12 +128,21 @@ export class ArticleService {
     const currentArticle = await this.getById(data?.id);
     if(!currentArticle) return null;;
 
-    await this.prisma.picture.deleteMany({where: {id: currentArticle?.pictureId || ''}});
     const mainFile = filesInfo?.find(f => data.pictureName && data.pictureName !== null && f.name === data.pictureName) || null;
-    
-    const mainPicture = await this.addPicture(mainFile);
+
+    let pictureId = data?.pictureId;
+    if(mainFile?.path){
+      const mainPicture = await this.addPicture(mainFile);
+      pictureId = mainPicture?.id;
+      await this.prisma.picture.deleteMany({
+        where : {
+          id: currentArticle?.pictureId || ''
+        }
+      });
+    }
+
     let videoId = data?.videoId;
-    if(!videoId)
+    if(videoInfo?.path)
     {
       const video = await this.addVideo(videoInfo);
       videoId = video?.id;
@@ -155,7 +164,7 @@ export class ArticleService {
         time: data?.time,
         videoId: videoId || null,
         list: data?.list ? JSON.stringify(data.list) : undefined,
-        pictureId: mainPicture?.id || null,
+        pictureId: pictureId || null,
       },
     });
 
@@ -167,16 +176,22 @@ export class ArticleService {
     }
 
     for (const item of data?.contentItems) {
-      let picture: Picture;
+      let itemPictureId = item?.pictureId;
       if (item?.pictureName) {
         const file = filesInfo?.find(f => f.name == item?.pictureName);
-        picture = await this.addPicture(file);
+        const picture = await this.addPicture(file);
+        itemPictureId = picture?.id;
+        await this.prisma.picture.deleteMany({
+          where : {
+            id: item?.pictureId || ''
+          }
+        });
       }
       await this.prisma.articleItem.create({
         data: {
           articleId: data?.id,
           text: item?.text,
-          pictureId: picture?.id || null,
+          pictureId: itemPictureId || null,
           list: item?.list ? JSON.stringify(item.list) : undefined,
         }});
     }

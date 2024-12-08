@@ -76,13 +76,16 @@ export class BuildService {
 
   async update(fileInfo?: {path?: string, name?: string, type?: string}, data?: UpdateBuildDto) {
     const updateItem = await this.findOne(data?.id);
-    const picture = await this.addPicture(fileInfo);
-
-    await this.prisma.picture.deleteMany({
-      where : {
-        id: updateItem?.pictureId || ''
-      }
-    });
+    let pictureId = data?.pictureId;
+    if(fileInfo?.path){
+      const picture = await this.addPicture(fileInfo);
+      pictureId = picture?.id;
+      await this.prisma.picture.deleteMany({
+        where : {
+          id: updateItem?.pictureId || ''
+        }
+      });
+    }
 
     return await this.prisma.build.update({ where: { id: data.id }, 
         data:{
@@ -94,7 +97,7 @@ export class BuildService {
           status: data?.status,
           coordinates: data?.coordinates ? JSON.stringify(data.coordinates) : undefined,
           list: data?.list ? JSON.stringify(data.list) : undefined,
-          pictureId: picture?.id || null,
+          pictureId: pictureId || null,
         }
     });
   }

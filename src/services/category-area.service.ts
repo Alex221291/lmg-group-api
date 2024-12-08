@@ -126,15 +126,18 @@ export class CategoryAreaService {
   async update(fileInfo?: {path?: string, name?: string, type?: string}, data?: UpdateCategoryAreaDto) {
     const updateItem = await this.findOne(data?.id);
 
-    const picture = await this.addPicture(fileInfo);
-    
-    await this.prisma.picture.deleteMany({
-      where : {
-        id: updateItem?.pictureId || ''
-      }
-    });
+    let pictureId = data?.pictureId;
+    if(fileInfo?.path){
+      const picture = await this.addPicture(fileInfo);
+      pictureId = picture?.id;
+      await this.prisma.picture.deleteMany({
+        where : {
+          id: updateItem?.pictureId || ''
+        }
+      });
+    }
     return await this.prisma.categoryArea.update({ where: { id: data.id }, data:{
-      ...data, pictureId: picture?.id || null,
+      ...data, pictureId: pictureId || null,
     } });
   }
 

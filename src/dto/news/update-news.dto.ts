@@ -7,6 +7,7 @@ export interface UpdateNewsDto {
     title?: string;
     subtitle?: string;
     pictureName?: string;
+    pictureId?: string;
     time?: string;
     videoId?: string;
     list?: ListDto[];

@@ -82,10 +82,18 @@ export class CategoryService {
 
   async update(fileInfo?: {path: string, type: string, name: string}, videoInfo?: {filename: string, originalname: string, path: string}, data?: UpdateCategoryDto): Promise<Category> {
     const updateItem = await this.getById(data?.id);
-
-    const picture = await this.addPicture(fileInfo);
+    let pictureId = data?.pictureId;
+    if(fileInfo?.path){
+      const picture = await this.addPicture(fileInfo);
+      pictureId = picture?.id;
+      await this.prisma.picture.deleteMany({
+        where : {
+          id: updateItem?.pictureId || ''
+        }
+      });
+    }
     let videoId = data?.videoId;
-    if(!videoId)
+    if(videoInfo?.path)
     {
       const video = await this.addVideo(videoInfo);
       videoId = video?.id;
@@ -107,7 +115,7 @@ export class CategoryService {
         sectionId: data?.sectionId || null,
         list: data?.list ? JSON.stringify(data.list) : undefined,
         status: data?.status,
-        pictureId: picture?.id || null,
+        pictureId: pictureId || null,
         videoId: videoId || null,
       },
     });

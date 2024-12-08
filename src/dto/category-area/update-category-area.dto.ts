@@ -8,5 +8,6 @@ export interface UpdateCategoryAreaDto {
   title?: string;
   description?: string;
   subTitle?: string;
+  pictureId?: string;
   status?: $Enums.ContentSatus;
 }

@@ -12,6 +12,7 @@ export interface CreateNewsDto {
 
 export interface ItemDto {
     text?: string;
+    pictureId?: string;
     pictureName?: string;
     list?: ListDto;
   }

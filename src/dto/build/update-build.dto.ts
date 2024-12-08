@@ -10,6 +10,7 @@ export interface UpdateBuildDto {
   list?: ModalList[];
   status: $Enums.ContentSatus;
   categoryAreaId?: string;
+  pictureId?: string;
 }
 
 export interface ModalList {

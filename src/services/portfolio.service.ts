@@ -66,13 +66,16 @@ export class PortfolioService {
   async update(fileInfo?: {path: string, type: string, name: string}, data?: UpdatePortfolioDto): Promise<Portfolio> {
     const updateItem = await this.getById(data?.id);
 
-    const picture = await this.addPicture(fileInfo);
-
-    await this.prisma.picture.deleteMany({
-      where : {
-        id: updateItem?.pictureId || ''
-      }
-    });
+    let pictureId = data?.pictureId;
+    if(fileInfo?.path){
+      const picture = await this.addPicture(fileInfo);
+      pictureId = picture?.id;
+      await this.prisma.picture.deleteMany({
+        where : {
+          id: updateItem?.pictureId || ''
+        }
+      });
+    }
     
     return await this.prisma.portfolio.update({
       where:{
@@ -82,7 +85,7 @@ export class PortfolioService {
         title: data?.title,
         description: data?.description,
         status: data?.status,
-        pictureId: picture?.id,
+        pictureId: pictureId || null,
         categoryId: data?.categoryId || null,
       },
     });
