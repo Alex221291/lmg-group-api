@@ -29,7 +29,7 @@ import { UpdateNewsStatusDto } from 'src/dto/news/update-news-status.dto';
     @Post('create')
     @UseInterceptors(
       FileFieldsInterceptor([
-        { name: 'files'},
+        { name: 'files[]'},
         { name: 'video', maxCount: 1 },
       ]),
     )
@@ -61,7 +61,7 @@ import { UpdateNewsStatusDto } from 'src/dto/news/update-news-status.dto';
     @Post('update')
     @UseInterceptors(
       FileFieldsInterceptor([
-        { name: 'files'},
+        { name: 'files[]'},
         { name: 'video', maxCount: 1 },
       ]),
     )

@@ -27,7 +27,7 @@ export class ArticleController {
   @Post('create')
   @UseInterceptors(
     FileFieldsInterceptor([
-      { name: 'files'},
+      { name: 'files[]'},
       { name: 'video', maxCount: 1 },
     ]),
   )
@@ -59,7 +59,7 @@ export class ArticleController {
   @Post('update')
   @UseInterceptors(
     FileFieldsInterceptor([
-      { name: 'files'},
+      { name: 'files[]', maxCount: 10 },
       { name: 'video', maxCount: 1 },
     ]),
   )
