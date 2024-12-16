@@ -3,6 +3,7 @@ import { PrismaService } from './prisma.service';
 import { CreateSectionDto } from '../dto/section/create-section.dto';
 import { GetSectionDto } from 'src/dto/section/get-section.dto';
 import { GetSectionMapDto } from 'src/dto/section/get-section-map.dto';
+import { GetPortfolioDto } from 'src/dto/portfolio/get-portfolio.dto';
 
 @Injectable()
 export class SectionService {
@@ -196,5 +197,55 @@ export class SectionService {
 
     return result;
   }
+  async getPortfolios(sectionNumber: number): Promise<any> { //GetPortfolioDto[]
+    const result = await this.prisma.section.findMany({
+        where:{
+            number: sectionNumber,
+        },
+        include: {
+            ategory: {
+                orderBy:{
+                    number: 'asc'
+                },
+                include:{
+                    portfolio: true,
+                }
+            }
+        }
+    });
 
+    const portfolios: GetPortfolioDto[] = result.flatMap(section =>
+        section.ategory.flatMap(category =>
+            category.portfolio.map(portfolio => ({
+                id: portfolio.id,
+                number: portfolio.number,
+                title: portfolio.title,
+                description: portfolio.description,
+                categoryId: portfolio.categoryId,
+                status: portfolio.status,
+                pictureId: portfolio.pictureId
+            }))
+        )
+    );
+
+    return portfolios;
+    }
+
+  async getAll(): Promise<GetPortfolioDto[]> {
+    const answer =  await this.prisma.portfolio.findMany({orderBy: {
+      number: 'asc'
+    }});
+
+    return answer?.map(item => {
+      return {
+        id: item?.id,
+        number: item?.number,
+        title: item?.title,
+        description: item?.description,
+        status: item?.status,
+        categoryId: item?.categoryId,
+        pictureId: item?.pictureId,
+      };
+    })
+  }
 }

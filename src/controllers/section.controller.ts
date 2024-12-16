@@ -36,4 +36,9 @@ export class SectionController {
   async getMap(@Param('id') id: string) {
     return await this.sectionsService.getMap(id);
   }
+
+  @Get('portfolio/:sectionNumber')
+  async getPortfolios(@Param('sectionNumber') sectionNumber: number) {
+    return await this.sectionsService.getPortfolios(sectionNumber);
+  }
 }
