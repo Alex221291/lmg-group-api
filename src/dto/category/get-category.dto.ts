@@ -8,6 +8,7 @@ export interface GetCategoryDto {
     subtitle: string;
     sectionId: string;
     pictureId?: string;
+    previewPictureId?: string;
     videoId?: string;
     list?: { title?: string; items?: { caption?: string; subcaption?: string }[] };
     status?: $Enums.ContentSatus;

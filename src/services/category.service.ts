@@ -61,8 +61,12 @@ export class CategoryService {
   }
 
   async create(fileInfo?: {path?: string, name?: string, type?: string}, 
-    videoInfo?: {filename?: string, originalname?: string, path?: string}, data?: CreateCategoryDto): Promise<Category> {
+    videoInfo?: {filename?: string, originalname?: string, path?: string},
+    previewPictureFileInfo?: {path?: string, name?: string, type?: string}, 
+    data?: CreateCategoryDto): Promise<Category> {
+
     const picture = await this.addPicture(fileInfo);
+    const previewPicture = await this.addPicture(previewPictureFileInfo);
     
     const video = await this.addVideo(videoInfo);
 
@@ -76,11 +80,16 @@ export class CategoryService {
         status: data?.status,
         pictureId: picture?.id || null,
         videoId: video?.id || null,
+        previewPictureId: previewPicture?.id || null,
       },
     });
   }
 
-  async update(fileInfo?: {path: string, type: string, name: string}, videoInfo?: {filename: string, originalname: string, path: string}, data?: UpdateCategoryDto): Promise<Category> {
+  async update(fileInfo?: {path: string, type: string, name: string}, 
+    videoInfo?: {filename: string, originalname: string, path: string},
+    previewPictureFileInfo?: {path?: string, name?: string, type?: string},
+    data?: UpdateCategoryDto): Promise<Category> {
+
     const updateItem = await this.getById(data?.id);
     let pictureId = data?.pictureId;
     if(fileInfo?.path){
@@ -92,6 +101,18 @@ export class CategoryService {
         }
       });
     }
+
+    let previewPictureId = data?.previewPictureId;
+    if(previewPictureFileInfo?.path){
+      const picture = await this.addPicture(previewPictureFileInfo);
+      previewPictureId = picture?.id;
+      await this.prisma.picture.deleteMany({
+        where : {
+          id: updateItem?.previewPictureId || ''
+        }
+      });
+    }
+
     let videoId = data?.videoId;
     if(videoInfo?.path)
     {
@@ -117,6 +138,7 @@ export class CategoryService {
         status: data?.status,
         pictureId: pictureId || null,
         videoId: videoId || null,
+        previewPictureId: previewPictureId || null,
       },
     });
   }

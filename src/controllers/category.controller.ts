@@ -24,15 +24,17 @@ export class CategoryController {
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'file', maxCount: 1 },
+      { name: 'previewPictureFile', maxCount: 1 },
       { name: 'video', maxCount: 1 },
     ]),
   )
-  async create(@UploadedFiles() files: { file?: Express.Multer.File[]; video?: Express.Multer.File[] }
+  async create(@UploadedFiles() files: { file?: Express.Multer.File[], video?: Express.Multer.File[], previewPictureFile?: Express.Multer.File[] }
   , @Body() data: CreateCategoryDto) {
     if(data?.list){
       data.list = typeof data.list === 'string' ? JSON.parse(data.list) : data.list;
     };
     const file = files.file ? files?.file[0] : null;
+    const previewPicture = files.previewPictureFile ? files?.previewPictureFile[0] : null;
     const video = files?.video ? files?.video[0] : null;
 
     const fileInfo = {
@@ -41,27 +43,35 @@ export class CategoryController {
       type: file?.mimetype,
     };
 
+    const previewPictureFileInfo = {
+      path: previewPicture?.path,
+      name: previewPicture?.originalname,
+      type: previewPicture?.mimetype,
+    };
+
     const videoInfo = {
       path: video?.path,
       filename: video?.filename,
       originalname: video?.originalname,
     };
-    return await this.categoryService.create(fileInfo, videoInfo, data);
+    return await this.categoryService.create(fileInfo, videoInfo, previewPictureFileInfo, data);
   }
 
   @Post('update')
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'file', maxCount: 1 },
+      { name: 'previewPictureFile', maxCount: 1 },
       { name: 'video', maxCount: 1 },
     ]),
   )
-  async update(@UploadedFiles() files: { file?: Express.Multer.File[]; video?: Express.Multer.File[] },
+  async update(@UploadedFiles() files: { file?: Express.Multer.File[]; video?: Express.Multer.File[], previewPictureFile?: Express.Multer.File[] },
    @Body() data: UpdateCategoryDto) {
     if(data?.list){
       data.list = typeof data.list === 'string' ? JSON.parse(data.list) : data.list;
     };
     const file = files.file ? files?.file[0] : null;
+    const previewPicture = files.previewPictureFile ? files?.previewPictureFile[0] : null;
     const video = files?.video ? files?.video[0] : null;
 
     const fileInfo = {
@@ -70,12 +80,18 @@ export class CategoryController {
       type: file?.mimetype,
     };
 
+    const previewPictureFileInfo = {
+      path: previewPicture?.path,
+      name: previewPicture?.originalname,
+      type: previewPicture?.mimetype,
+    };
+
     const videoInfo = {
       path: video?.path,
       filename: video?.filename,
       originalname: video?.originalname,
     };
-    return await this.categoryService.update(fileInfo, videoInfo, data);
+    return await this.categoryService.update(fileInfo, videoInfo, previewPictureFileInfo, data);
   }
 
   @Delete(':id')
