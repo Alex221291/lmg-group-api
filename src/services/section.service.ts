@@ -4,6 +4,7 @@ import { CreateSectionDto } from '../dto/section/create-section.dto';
 import { GetSectionDto } from 'src/dto/section/get-section.dto';
 import { GetSectionMapDto } from 'src/dto/section/get-section-map.dto';
 import { GetPortfolioDto } from 'src/dto/portfolio/get-portfolio.dto';
+import { $Enums } from '@prisma/client';
 
 @Injectable()
 export class SectionService {
@@ -34,10 +35,13 @@ export class SectionService {
           where: { id: sectionId },
           include: {
               ategory: {
+                where: { status: $Enums.ContentSatus.PUBLISHED },
                   include: {
                       categoryArea: {
+                        where: { status: $Enums.ContentSatus.PUBLISHED },
                           include: {
                               build: {
+                                where: { status: $Enums.ContentSatus.PUBLISHED },
                                   select: {
                                       id: true,
                                       name: true,
@@ -116,12 +120,16 @@ export class SectionService {
 
   async getAllMaps(): Promise<GetSectionMapDto[]> {
     const sections = await this.prisma.section.findMany({
+        where: { status: $Enums.ContentSatus.PUBLISHED },
         include: {
             ategory: {
+                where: { status: $Enums.ContentSatus.PUBLISHED },
                 include: {
                     categoryArea: {
+                        where: { status: $Enums.ContentSatus.PUBLISHED },
                         include: {
                             build: {
+                                where: { status: $Enums.ContentSatus.PUBLISHED },
                                 select: {
                                     id: true,
                                     name: true,
@@ -201,6 +209,7 @@ export class SectionService {
     const result = await this.prisma.section.findMany({
         where:{
             number: sectionNumber,
+            status: $Enums.ContentSatus.PUBLISHED,
         },
         include: {
             ategory: {
