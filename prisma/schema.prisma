@@ -30,6 +30,7 @@ model Picture {
   feedback Feedback[]
   category Category[]
   previewPicture Category[] @relation("PreviewPicture")
+  buildIconPictures Build[] @relation("BuildIconPicture")
   @@map("pictures")
 }
 
@@ -194,7 +195,7 @@ model CategoryArea {
 model Build {
   id                String        @default(uuid()) @id
   number            Int           @default(autoincrement())
-  coordinates              Json?
+  coordinates       Json?
   name              String?       @db.VarChar(500)
   wDescription      String?       @db.VarChar(3000)
   picture           Picture?   @relation(fields: [pictureId], references: [id])
@@ -205,6 +206,9 @@ model Build {
   status            ContentSatus?
   categoryAreaId     String?  @default(uuid())
   categoryArea       CategoryArea?     @relation(fields: [categoryAreaId], references: [id])
+  iconPicture Picture? @relation("BuildIconPicture", fields: [iconPictureId], references: [id])
+  iconPictureId String? @default(uuid())
+  buildAreaCoordinates              Json?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
   @@map("builds")

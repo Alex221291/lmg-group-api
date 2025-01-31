@@ -29,6 +29,8 @@ import { CategoryAreaService } from './services/category-area.service';
 import { AreaService } from './services/area.service';
 import { BuildService } from './services/build.service';
 import { VideoController } from './controllers/video.controller';
+import { ParserService } from './services/parser.service';
+import { ParserController } from './controllers/parser.controller';
 
 @Module({
   imports: [
@@ -42,7 +44,7 @@ import { VideoController } from './controllers/video.controller';
         }), 
       }),
   ],
-  controllers: [ PictureController, AppController, NewsController, MailController, ArticleController, PortfolioController, FeedbackController, SectionController, CategoryController, AreaController, CategoryAreaController, BuildController, VideoController, MailController],
-  providers: [ PrismaService, PictureService, FileService, NewsService, MailService, ArticleService, PortfolioService, FeedbackService, SectionService, CategoryService, AreaService, CategoryAreaService, BuildService, VideoService, MailService],
+  controllers: [ PictureController, AppController, NewsController, MailController, ArticleController, PortfolioController, FeedbackController, SectionController, CategoryController, AreaController, CategoryAreaController, BuildController, VideoController, MailController, ParserController],
+  providers: [ PrismaService, PictureService, FileService, NewsService, MailService, ArticleService, PortfolioService, FeedbackService, SectionService, CategoryService, AreaService, CategoryAreaService, BuildService, VideoService, MailService, ParserService],
 })
 export class AppModule {}
