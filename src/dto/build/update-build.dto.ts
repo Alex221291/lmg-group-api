@@ -9,13 +9,8 @@ export interface UpdateBuildDto {
   wDescription?: string;
   gTitle?: string;
   gSubTitle?: string;
-  list?: ModalList[];
+  list?: { title?: string; value?: string; }[];
   status: $Enums.ContentSatus;
   categoryAreaId?: string;
   pictureId?: string;
-}
-
-export interface ModalList {
-    title?: string;
-    value?: string;
 }
