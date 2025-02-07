@@ -34,7 +34,9 @@ export class BuildService {
       status: build.status,
       categoryAreaId: build.categoryAreaId,
       createdAt: build.createdAt,
-      updatedAt: build.updatedAt
+      updatedAt: build.updatedAt,
+      buildAreaCoordinates: build.buildAreaCoordinates ? JSON.parse(build.buildAreaCoordinates as unknown as string) : [],
+      iconPictureId: build.iconPictureId,
     }));
   }
 
@@ -53,12 +55,16 @@ export class BuildService {
       status: build.status,
       categoryAreaId: build.categoryAreaId,
       createdAt: build.createdAt,
-      updatedAt: build.updatedAt
+      updatedAt: build.updatedAt,
+      buildAreaCoordinates: build.buildAreaCoordinates ? JSON.parse(build.buildAreaCoordinates as unknown as string) : [],
+      iconPictureId: build.iconPictureId,
     };
   }
 
-  async create(fileInfo?: {path?: string, name?: string, type?: string}, data?: CreateBuildDto) {
+  async create(fileInfo?: {path?: string, name?: string, type?: string}, iconInfo?: {path?: string, name?: string, type?: string}, data?: CreateBuildDto) {
     const picture = await this.addPicture(fileInfo);
+    const icon = await this.addPicture(iconInfo);
+
     return await this.prisma.build.create({ 
         data:{
           categoryAreaId: data?.categoryAreaId || null,
@@ -69,20 +75,34 @@ export class BuildService {
           status: data?.status,
           coordinates: data?.coordinates ? JSON.stringify(data.coordinates) : undefined,
           list: data?.list ? JSON.stringify(data.list) : undefined,
+          buildAreaCoordinates: data?.buildAreaCoordinates ? JSON.stringify(data.buildAreaCoordinates) : undefined,
           pictureId: picture?.id || null,
+          iconPictureId: icon?.id || null,
         }
     });
   }
 
-  async update(fileInfo?: {path?: string, name?: string, type?: string}, data?: UpdateBuildDto) {
+  async update(fileInfo?: {path?: string, name?: string, type?: string},  iconInfo?: {path?: string, name?: string, type?: string}, data?: UpdateBuildDto) {
     const updateItem = await this.findOne(data?.id);
     let pictureId = data?.pictureId;
+    let iconId = data?.iconPictureId;
+
     if(fileInfo?.path){
       const picture = await this.addPicture(fileInfo);
       pictureId = picture?.id;
       await this.prisma.picture.deleteMany({
         where : {
           id: updateItem?.pictureId || ''
+        }
+      });
+    }
+
+    if(iconInfo?.path){
+      const icon = await this.addPicture(iconInfo);
+      iconId = icon?.id;
+      await this.prisma.picture.deleteMany({
+        where : {
+          id: updateItem?.iconPictureId || ''
         }
       });
     }
@@ -97,7 +117,9 @@ export class BuildService {
           status: data?.status,
           coordinates: data?.coordinates ? JSON.stringify(data.coordinates) : undefined,
           list: data?.list ? JSON.stringify(data.list) : undefined,
+          buildAreaCoordinates: data?.buildAreaCoordinates ? JSON.stringify(data.buildAreaCoordinates) : undefined,
           pictureId: pictureId || null,
+          iconPictureId: iconId || null,
         }
     });
   }

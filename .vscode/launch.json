@@ -1,21 +1,15 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        {
-            "type": "node",
-            "request": "launch",
-            "name": "Launch Program",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}\\src\\controllers\\paper.controller.ts",
-            "preLaunchTask": "tsc: build - tsconfig.json",
-            "outFiles": [
-                "${workspaceFolder}/dist/**/*.js"
-            ]
-        }
+      {
+        "type": "node",
+        "request": "launch",
+        "name": "Launch Program",
+        "skipFiles": ["<node_internals>/**"],
+        "program": "${workspaceFolder}/src/main.ts",  // Путь к вашему основному файлу TypeScript
+        "outFiles": ["${workspaceFolder}/dist/**/*.js"],  // Убедитесь, что пути совпадают с outDir из tsconfig.json
+        "preLaunchTask": "tsc: build - tsconfig.json"
+      }
     ]
-}
+  }
+  
