@@ -70,11 +70,15 @@ export class ParserService {
     const worksheet = workbook.Sheets['Юниты'];
     
     if (!worksheet) {
-      throw new Error('Лист "Юниты" не найден в файле.');
+      throw new ApiError({error: 'Лист "Юниты" не найден в файле.'});
     }
 
     // Парсим данные, включая заголовки
     const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: null });
+
+    if (jsonData.length <= 1) {
+      throw new ApiError({error: 'Лист "Юниты" пустой.'});
+    }
 
     // Первая строка будет заголовками
     const headers = jsonData[0];
@@ -103,11 +107,11 @@ export class ParserService {
     const parsedData = jsonData.slice(1).map((row: any[]) => {
       const parsedRow: any = {};
       row.forEach((cell, index) => {
-        parsedRow[columnNames[index]] = cell;
+        parsedRow[columnNames[index]] = cell !== null ? String(cell).trim().replace(/\s+/g, ' ') : cell;
       });
 
       // Преобразование buildAreaCoordinates к формату [number, number][]
-      if (parsedRow.buildAreaCoordinates) {
+      if (parsedRow.buildAreaCoordinates && parsedRow.buildAreaCoordinates.length > 0) {
         parsedRow.buildAreaCoordinates = parsedRow.buildAreaCoordinates.split('][')
           .map((coord: string) => {
             const [lon, lat] = coord.replace(/[\[\]]/g, '').split(';').map(Number);
@@ -136,17 +140,17 @@ export class ParserService {
       }
 
       // Проверка URL
-      if (gPictureLink && !await this.isValidUrl(gPictureLink)) {
+      if (gPictureLink != null && gPictureLink.length < 1 && !await this.isValidUrl(gPictureLink)) {
         errors.push(`Строка ${i + 2}: некорректный URL '${gPictureLink}'.`);
       }
-      if (iconLink && !await this.isValidUrl(iconLink)) {
+      if (iconLink != null && iconLink.length < 1 && !await this.isValidUrl(iconLink)) {
         errors.push(`Строка ${i + 2}: некорректный URL '${iconLink}'.`);
       }
 
       // Проверка цепочек
       const sectionRecord = await this.prisma.section.findFirst({ where: { title: section } });
       if (!sectionRecord) {
-        errors.push(`Строка ${i + 2}: Раздел '${section}' не найдена.`);
+        errors.push(`Строка ${i + 2}: Раздел '${section}' не найден.`);
         continue;
       }
 
@@ -169,7 +173,7 @@ export class ParserService {
       }
 
       //Проверка координат
-      if (buildAreaCoordinates) {
+      if (buildAreaCoordinates && buildAreaCoordinates.length > 0) {
         for (const coord of buildAreaCoordinates) {
           if (isNaN(coord[0]) || isNaN(coord[1])) {
             errors.push(`Строка ${i + 2}: Некорректно заполнены координаты '${buildAreaCoordinates}'.`);
