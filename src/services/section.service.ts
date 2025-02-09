@@ -42,13 +42,13 @@ export class SectionService {
                           include: {
                               build: {
                                 where: { status: $Enums.ContentSatus.PUBLISHED },
-                                  select: {
-                                      id: true,
-                                      name: true,
-                                      coordinates: true,
-                                      list: true,
-                                      categoryAreaId: true
-                                  }
+                                //   select: {
+                                //       id: true,
+                                //       name: true,
+                                //       coordinates: true,
+                                //       list: true,
+                                //       categoryAreaId: true
+                                //   }
                               }
                           }
                       }
@@ -84,14 +84,27 @@ export class SectionService {
                   // Распарсить list
                   const parsedList = JSON.parse(buildItem.list as string) as { title: string; value: string }[];
                   buildItem.list = parsedList;
-  
+                  
+                  const parsedBuildAreaCoordinates = JSON.parse(buildItem.buildAreaCoordinates as string) as [number, number][];
+                  buildItem.buildAreaCoordinates = parsedBuildAreaCoordinates;
+
                   result.build.push({
                     id: buildItem.id,
-                    name: buildItem?.name,
+                    categoryId: cat.id,
                     categoryAreaId: buildItem?.categoryAreaId,
+                    number: buildItem.number,
                     coordinates: parsedCoordinates,
-                    list: parsedList,
-                    categoryId: cat.id
+                    buildAreaCoordinates: parsedBuildAreaCoordinates,
+                    iconPictureId: buildItem.iconPictureId,
+                    name: buildItem?.name,
+                    wDescription: buildItem.wDescription,
+                    pictureId: buildItem.pictureId,
+                    gTitle: buildItem.gTitle,
+                    gSubTitle: buildItem.gSubTitle,                    
+                    list: parsedList,                    
+                    createdAt: buildItem.createdAt,
+                    updatedAt: buildItem.updatedAt,
+                    status: buildItem. status,
                   });
               });
           });
@@ -130,13 +143,13 @@ export class SectionService {
                         include: {
                             build: {
                                 where: { status: $Enums.ContentSatus.PUBLISHED },
-                                select: {
-                                    id: true,
-                                    name: true,
-                                    coordinates: true,
-                                    list: true,
-                                    categoryAreaId: true
-                                }
+                                // select: {
+                                //     id: true,
+                                //     name: true,
+                                //     coordinates: true,
+                                //     list: true,
+                                //     categoryAreaId: true
+                                // }
                             }
                         }
                     }
@@ -170,13 +183,27 @@ export class SectionService {
                     const parsedList = JSON.parse(buildItem.list as string) as { title: string; value: string }[];
                     buildItem.list = parsedList;
 
+                    const parsedBuildAreaCoordinates = JSON.parse(buildItem.buildAreaCoordinates as string) as [number, number][];
+                    buildItem.buildAreaCoordinates = parsedBuildAreaCoordinates;
+
+
                     sectionDto.build.push({
-                      id: buildItem.id,
-                      name: buildItem?.name,
-                      categoryAreaId: buildItem?.categoryAreaId,
-                      coordinates: parsedCoordinates,
-                      list: parsedList,
-                      categoryId: cat.id
+                        id: buildItem.id,
+                        categoryId: cat.id,
+                        categoryAreaId: buildItem?.categoryAreaId,
+                        number: buildItem.number,
+                        coordinates: parsedCoordinates,
+                        buildAreaCoordinates: parsedBuildAreaCoordinates,
+                        iconPictureId: buildItem.iconPictureId,
+                        name: buildItem?.name,
+                        wDescription: buildItem.wDescription,
+                        pictureId: buildItem.pictureId,
+                        gTitle: buildItem.gTitle,
+                        gSubTitle: buildItem.gSubTitle,                    
+                        list: parsedList,                    
+                        createdAt: buildItem.createdAt,
+                        updatedAt: buildItem.updatedAt,
+                        status: buildItem. status,
                     });
                 });
             });

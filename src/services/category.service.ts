@@ -3,7 +3,7 @@ import { PrismaService } from './prisma.service';
 import { CreateCategoryDto } from '../dto/category/create-category.dto';
 import { GetCategoryDto } from 'src/dto/category/get-category.dto';
 import { FileService } from './file.service';
-import { Category } from '@prisma/client';
+import { Category, Prisma } from '@prisma/client';
 import { UpdateCategoryDto } from 'src/dto/category/update-category.dto';
 import { UpdateCategoryStatusDto } from 'src/dto/category/update-category-status.dto';
 import { createReadStream } from 'fs';
@@ -12,39 +12,71 @@ import { createReadStream } from 'fs';
 export class CategoryService {
   constructor(private prisma: PrismaService, private fileService: FileService) {}
 
-  async getAll(sectionId: string):Promise<GetCategoryDto[]> {
-    let params = {};
-    if(sectionId){
-      params = {...params, where:{sectionId}};
+  async getAll(sectionId: string): Promise<GetCategoryDto[]> {
+    let params: Prisma.CategoryFindManyArgs = {};
+    if (sectionId) {
+      params.where = { sectionId };
     }
-    let answer = await this.prisma.category.findMany(params);
-
-    return answer.map(item => {
-      return {
-        id: item.id,
-        number: item.number,
-        title: item.title,
-        description: item.description,
-        subtitle: item.subtitle,
-        sectionId: item.sectionId,
-        pictureId: item.pictureId,
-        previewPictureId: item.previewPictureId,
-        videoId: item.videoId,
-        list: item.list ? JSON.parse(item.list as unknown as string) : {},
-        status: item.status,
-        createdAt: item.createdAt,
-        updatedAt: item.updatedAt
-      };
-
+  
+    let answer = await this.prisma.category.findMany({
+      where: sectionId ? { sectionId } : undefined,
+      include: {
+        categoryArea: {
+          include: {
+            build: true
+          }
+        }
+      }
     });
+  
+    return answer.map(item => ({
+      id: item.id,
+      number: item.number,
+      title: item.title,
+      description: item.description,
+      subtitle: item.subtitle,
+      sectionId: item.sectionId,
+      pictureId: item.pictureId,
+      previewPictureId: item.previewPictureId,
+      videoId: item.videoId,
+      list: item.list ? JSON.parse(item.list as unknown as string) : {},
+      status: item.status,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+      build: item.categoryArea?.flatMap(categoryArea => categoryArea.build.map(build => ({
+        id: build.id,
+        categoryId: item.id,
+        categoryAreaId: build.categoryAreaId,
+        number: build.number,
+        coordinates: build.coordinates ? JSON.parse(build.coordinates as string) as [number, number][] : undefined,
+        buildAreaCoordinates: build.buildAreaCoordinates ? JSON.parse(build.buildAreaCoordinates as string) as [number, number][] : undefined,
+        iconPictureId: build.iconPictureId,
+        name: build.name,
+        wDescription: build.wDescription,
+        pictureId: build.pictureId,
+        gTitle: build.gTitle,
+        gSubTitle: build.gSubTitle,
+        list: build.list ? JSON.parse(build.list as string) as { title: string; value: string }[] : [],
+        status: build.status,
+        createdAt: build.createdAt,
+        updatedAt: build.updatedAt
+      }))) ?? []
+    }));
   }
-
+  
   async getById(id: string): Promise<GetCategoryDto | null> {
-    const answer =  await this.prisma.category.findUnique({
-      where: {id},
+    const answer = await this.prisma.category.findUnique({
+      where: { id },
+      include: {
+        categoryArea: {
+          include: {
+            build: true
+          }
+        }
+      }
     });
-    if(!answer) return null;
-
+    if (!answer) return null;
+  
     return {
       id: answer.id,
       number: answer.number,
@@ -58,7 +90,25 @@ export class CategoryService {
       list: answer.list ? JSON.parse(answer.list as unknown as string) : {},
       status: answer.status,
       createdAt: answer.createdAt,
-      updatedAt: answer.updatedAt
+      updatedAt: answer.updatedAt,
+      build: answer.categoryArea.flatMap(categoryArea => categoryArea.build.map(build => ({
+        id: build.id,
+        categoryId: answer.id,
+        categoryAreaId: build.categoryAreaId,
+        number: build.number,
+        coordinates: build.coordinates ? JSON.parse(build.coordinates as unknown as string) : undefined,
+        buildAreaCoordinates: build.buildAreaCoordinates ? JSON.parse(build.buildAreaCoordinates as unknown as string) : undefined,
+        iconPictureId: build.iconPictureId,
+        name: build.name,
+        wDescription: build.wDescription,
+        pictureId: build.pictureId,
+        gTitle: build.gTitle,
+        gSubTitle: build.gSubTitle,
+        list: build.list ? JSON.parse(build.list as unknown as string) : [],
+        status: build.status,
+        createdAt: build.createdAt,
+        updatedAt: build.updatedAt
+      })))
     };
   }
 
