@@ -13,14 +13,23 @@ export class BuildService {
     private fileService: FileService
   ) {}
 
-  async findAll(categoryAreaId?: string): Promise<GetBuildDto[]> {
+  async findAll(categoryAreaId?: string): Promise<any> { //GetBuildDto[]
     let params = {};
     if (categoryAreaId) {
       params = { ...params, where: { categoryAreaId } };
     }
 
-    const builds = await this.prisma.build.findMany(params);
-    
+    const builds = await this.prisma.build.findMany(
+      {
+        where: categoryAreaId ? { categoryAreaId } : undefined,
+        include: {
+        categoryArea: {
+          include: {
+            category: true
+          }
+        }
+      }}
+    );
     return builds.map(build => ({
       id: build.id,
       number: build.number,
@@ -36,12 +45,18 @@ export class BuildService {
       createdAt: build.createdAt,
       updatedAt: build.updatedAt,
       buildAreaCoordinates: build.buildAreaCoordinates ? JSON.parse(build.buildAreaCoordinates as unknown as string) : [],
-      iconPictureId: build.iconPictureId,
+      iconPictureId: build?.categoryArea?.category?.iconPictureId,
     }));
   }
 
   async findOne(id: string) {
-    const build = await this.prisma.build.findUnique({ where: { id } });
+    const build = await this.prisma.build.findUnique({ where: { id },
+      include: {
+        categoryArea: {
+          include: {
+            category: true
+          }
+      }}});
     return{
       id: build.id,
       number: build.number,
@@ -57,7 +72,7 @@ export class BuildService {
       createdAt: build.createdAt,
       updatedAt: build.updatedAt,
       buildAreaCoordinates: build.buildAreaCoordinates ? JSON.parse(build.buildAreaCoordinates as unknown as string) : [],
-      iconPictureId: build.iconPictureId,
+      iconPictureId: build?.categoryArea?.category?.iconPictureId,
     };
   }
 
