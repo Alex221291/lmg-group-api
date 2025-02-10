@@ -31,6 +31,7 @@ model Picture {
   category Category[]
   previewPicture Category[] @relation("PreviewPicture")
   buildIconPictures Build[] @relation("BuildIconPicture")
+  categoryIconPictures Category[] @relation("CategoryIconPicture")
   @@map("pictures")
 }
 
@@ -151,6 +152,8 @@ model Category {
   video    Video?    @relation(fields: [videoId], references: [id])
   previewPicture Picture? @relation("PreviewPicture", fields: [previewPictureId], references: [id])
   previewPictureId String? @default(uuid())
+  iconPicture Picture? @relation("CategoryIconPicture", fields: [iconPictureId], references: [id])
+  iconPictureId String? @default(uuid())
   videoId  String? @default(uuid())
   list        Json?
   status            ContentSatus?

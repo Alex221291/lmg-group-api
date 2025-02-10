@@ -9,6 +9,7 @@ import { ApiError } from 'src/engine/api-error';
 import { $Enums } from '@prisma/client';
 import fetch from 'node-fetch';
 import { FileService } from './file.service';
+import { contains } from 'class-validator';
 
 @Injectable()
 export class ParserService {
@@ -114,8 +115,8 @@ export class ParserService {
       if (parsedRow.buildAreaCoordinates && parsedRow.buildAreaCoordinates.length > 0) {
         parsedRow.buildAreaCoordinates = parsedRow.buildAreaCoordinates.split('][')
           .map((coord: string) => {
-            const [lon, lat] = coord.replace(/[\[\]]/g, '').split(';').map(Number);
-            return [lon, lat];
+            const [lat, lon] = coord.replace(/[\[\]]/g, '').split(';').map(Number);
+            return [lat, lon];
           });
       }
       return parsedRow;
@@ -275,6 +276,25 @@ export class ParserService {
 
     if (!categoryRecord) {
       return null; // Пропустить если не найдено
+    }
+
+    if(item.iconLink){
+      const iconPictureId = await this.downloadAndSaveImage(item.iconLink);
+      
+      await this.prisma.picture.deleteMany({
+        where: {
+          id: categoryRecord.pictureId || ''
+        }
+      });
+
+      await this.prisma.category.update({
+        where:{
+          id: categoryRecord.id
+        },
+        data:{
+          iconPictureId: iconPictureId,
+        }
+      });
     }
 
     // Найти область

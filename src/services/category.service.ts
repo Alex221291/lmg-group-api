@@ -38,6 +38,7 @@ export class CategoryService {
       sectionId: item.sectionId,
       pictureId: item.pictureId,
       previewPictureId: item.previewPictureId,
+      iconPictureId: item.iconPictureId,
       videoId: item.videoId,
       list: item.list ? JSON.parse(item.list as unknown as string) : {},
       status: item.status,
@@ -50,7 +51,7 @@ export class CategoryService {
         number: build.number,
         coordinates: build.coordinates ? JSON.parse(build.coordinates as string) as [number, number][] : undefined,
         buildAreaCoordinates: build.buildAreaCoordinates ? JSON.parse(build.buildAreaCoordinates as string) as [number, number][] : undefined,
-        iconPictureId: build.iconPictureId,
+        iconPictureId: item.iconPictureId,
         name: build.name,
         wDescription: build.wDescription,
         pictureId: build.pictureId,
@@ -86,6 +87,7 @@ export class CategoryService {
       sectionId: answer.sectionId,
       pictureId: answer.pictureId,
       previewPictureId: answer.previewPictureId,
+      iconPictureId: answer.iconPictureId,
       videoId: answer.videoId,
       list: answer.list ? JSON.parse(answer.list as unknown as string) : {},
       status: answer.status,
@@ -98,7 +100,7 @@ export class CategoryService {
         number: build.number,
         coordinates: build.coordinates ? JSON.parse(build.coordinates as unknown as string) : undefined,
         buildAreaCoordinates: build.buildAreaCoordinates ? JSON.parse(build.buildAreaCoordinates as unknown as string) : undefined,
-        iconPictureId: build.iconPictureId,
+        iconPictureId: answer.iconPictureId,
         name: build.name,
         wDescription: build.wDescription,
         pictureId: build.pictureId,
@@ -115,11 +117,14 @@ export class CategoryService {
   async create(fileInfo?: {path?: string, name?: string, type?: string}, 
     videoInfo?: {filename?: string, originalname?: string, path?: string},
     previewPictureFileInfo?: {path?: string, name?: string, type?: string}, 
+    iconInfo?: {path?: string, name?: string, type?: string}, 
     data?: CreateCategoryDto): Promise<Category> {
 
     const picture = await this.addPicture(fileInfo);
     const previewPicture = await this.addPicture(previewPictureFileInfo);
-    
+    const icon = await this.addPicture(iconInfo);
+    console.log(iconInfo)
+    console.log(icon)
     const video = await this.addVideo(videoInfo);
 
     return await this.prisma.category.create({
@@ -133,6 +138,7 @@ export class CategoryService {
         pictureId: picture?.id || null,
         videoId: video?.id || null,
         previewPictureId: previewPicture?.id || null,
+        iconPictureId: icon?.id || null,
       },
     });
   }
@@ -140,6 +146,7 @@ export class CategoryService {
   async update(fileInfo?: {path: string, type: string, name: string}, 
     videoInfo?: {filename: string, originalname: string, path: string},
     previewPictureFileInfo?: {path?: string, name?: string, type?: string},
+    iconInfo?: {path?: string, name?: string, type?: string}, 
     data?: UpdateCategoryDto): Promise<Category> {
 
     const updateItem = await this.getById(data?.id);
@@ -176,6 +183,17 @@ export class CategoryService {
         }
       });
     }
+
+    let iconPictureId = data?.iconPictureId;
+    if(iconInfo?.path){
+      const icon = await this.addPicture(iconInfo);
+      iconPictureId = icon?.id;
+      await this.prisma.picture.deleteMany({
+        where : {
+          id: updateItem?.iconPictureId || ''
+        }
+      });
+    }
     
     return await this.prisma.category.update({
       where:{
@@ -191,6 +209,7 @@ export class CategoryService {
         pictureId: pictureId || null,
         videoId: videoId || null,
         previewPictureId: previewPictureId || null,
+        iconPictureId: iconPictureId || null,
       },
     });
   }

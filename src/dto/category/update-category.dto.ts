@@ -8,6 +8,7 @@ export interface UpdateCategoryDto {
     sectionId?: string;
     pictureId?: string;
     previewPictureId?: string;
+    iconPictureId: string | null;
     videoId?: string;
     list?: { title?: string; items?: { caption?: string; subcaption?: string }[] };
     status?: $Enums.ContentSatus;

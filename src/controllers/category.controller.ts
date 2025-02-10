@@ -26,9 +26,16 @@ export class CategoryController {
       { name: 'file', maxCount: 1 },
       { name: 'previewPictureFile', maxCount: 1 },
       { name: 'video', maxCount: 1 },
+      { name: 'icon', maxCount: 1 },
     ]),
   )
-  async create(@UploadedFiles() files: { file?: Express.Multer.File[], video?: Express.Multer.File[], previewPictureFile?: Express.Multer.File[] }
+  async create(
+    @UploadedFiles() files: { 
+      file?: Express.Multer.File[], 
+      video?: Express.Multer.File[], 
+      previewPictureFile?: Express.Multer.File[],
+      icon?: Express.Multer.File[],
+     }
   , @Body() data: CreateCategoryDto) {
     if(data?.list){
       data.list = typeof data.list === 'string' ? JSON.parse(data.list) : data.list;
@@ -36,6 +43,7 @@ export class CategoryController {
     const file = files.file ? files?.file[0] : null;
     const previewPicture = files.previewPictureFile ? files?.previewPictureFile[0] : null;
     const video = files?.video ? files?.video[0] : null;
+    const icon = files?.icon ? files?.icon[0] : null;
 
     const fileInfo = {
       path: file?.path,
@@ -54,7 +62,13 @@ export class CategoryController {
       filename: video?.filename,
       originalname: video?.originalname,
     };
-    return await this.categoryService.create(fileInfo, videoInfo, previewPictureFileInfo, data);
+
+    const iconInfo = {
+      path: icon?.path,
+      filename: icon?.filename,
+      originalname: icon?.originalname,
+    };
+    return await this.categoryService.create(fileInfo, videoInfo, previewPictureFileInfo, iconInfo, data);
   }
 
   @Post('update')
@@ -63,9 +77,15 @@ export class CategoryController {
       { name: 'file', maxCount: 1 },
       { name: 'previewPictureFile', maxCount: 1 },
       { name: 'video', maxCount: 1 },
+      { name: 'icon', maxCount: 1 },
     ]),
   )
-  async update(@UploadedFiles() files: { file?: Express.Multer.File[]; video?: Express.Multer.File[], previewPictureFile?: Express.Multer.File[] },
+  async update(
+    @UploadedFiles() files: { 
+      file?: Express.Multer.File[],
+      video?: Express.Multer.File[], 
+      previewPictureFile?: Express.Multer.File[],
+      icon?: Express.Multer.File[] },
    @Body() data: UpdateCategoryDto) {
     if(data?.list){
       data.list = typeof data.list === 'string' ? JSON.parse(data.list) : data.list;
@@ -73,6 +93,7 @@ export class CategoryController {
     const file = files.file ? files?.file[0] : null;
     const previewPicture = files.previewPictureFile ? files?.previewPictureFile[0] : null;
     const video = files?.video ? files?.video[0] : null;
+    const icon = files?.icon ? files?.icon[0] : null;
 
     const fileInfo = {
       path: file?.path,
@@ -91,7 +112,13 @@ export class CategoryController {
       filename: video?.filename,
       originalname: video?.originalname,
     };
-    return await this.categoryService.update(fileInfo, videoInfo, previewPictureFileInfo, data);
+
+    const iconInfo = {
+      path: icon?.path,
+      filename: icon?.filename,
+      originalname: icon?.originalname,
+    };
+    return await this.categoryService.update(fileInfo, videoInfo, previewPictureFileInfo, iconInfo, data);
   }
 
   @Delete(':id')
