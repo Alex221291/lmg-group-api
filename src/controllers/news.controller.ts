@@ -29,13 +29,13 @@ import { UpdateNewsStatusDto } from 'src/dto/news/update-news-status.dto';
     @Post('create')
     @UseInterceptors(
       FileFieldsInterceptor([
-        { name: 'files', maxCount: 10 },
+        { name: 'files[]', maxCount: 10 },
         { name: 'video', maxCount: 1 },
       ]),
     )
-    async createNews(@UploadedFiles() files: { files?: Express.Multer.File[]; video?: Express.Multer.File[] }, 
+    async createNews(@UploadedFiles() files: { 'files[]'?: Express.Multer.File[]; video?: Express.Multer.File[] }, 
     @Body() data: CreateNewsDto): Promise<GetNewsDto | null> {
-      console.log(files?.files);
+      console.log(files?.['files[]']);
       console.log(data);
       if(data?.contentItems){
         data.contentItems = typeof data.contentItems === 'string' ? JSON.parse(data.contentItems) : data.contentItems;
@@ -44,7 +44,7 @@ import { UpdateNewsStatusDto } from 'src/dto/news/update-news-status.dto';
         data.list = typeof data.list === 'string' ? JSON.parse(data.list) : data.list;
       }
       
-      const filesInfo = files?.files?.map(file => {
+      const filesInfo = files?.['files[]']?.map(file => {
         return {
           path: file?.path,
           name: file?.originalname,
@@ -63,13 +63,13 @@ import { UpdateNewsStatusDto } from 'src/dto/news/update-news-status.dto';
     @Post('update')
     @UseInterceptors(
       FileFieldsInterceptor([
-        { name: 'files', maxCount: 10 },
+        { name: 'files[]', maxCount: 10 },
         { name: 'video', maxCount: 1 },
       ]),
     )
-    async updateNews(@UploadedFiles() files: { files?: Express.Multer.File[]; video?: Express.Multer.File[] }, 
+    async updateNews(@UploadedFiles() files: { 'files[]'?: Express.Multer.File[]; video?: Express.Multer.File[] }, 
     @Body() data: UpdateNewsDto): Promise<GetNewsDto | null> {
-      console.log(files?.files);
+      console.log(files?.['files[]']);
       console.log(data);
       if(data?.contentItems){
         data.contentItems = typeof data.contentItems === 'string' ? JSON.parse(data.contentItems) : data.contentItems;
@@ -78,7 +78,7 @@ import { UpdateNewsStatusDto } from 'src/dto/news/update-news-status.dto';
         data.list = typeof data.list === 'string' ? JSON.parse(data.list) : data.list;
       }
 
-      const filesInfo = files?.files?.map(file => {
+      const filesInfo = files?.['files[]']?.map(file => {
         return {
           path: file?.path,
           name: file?.originalname,
