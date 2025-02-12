@@ -35,6 +35,7 @@ import { UpdateNewsStatusDto } from 'src/dto/news/update-news-status.dto';
     )
     async createNews(@UploadedFiles() files: { 'files[]'?: Express.Multer.File[]; video?: Express.Multer.File[] }, 
     @Body() data: CreateNewsDto): Promise<GetNewsDto | null> {
+      console.log(data);
       if(data?.contentItems){
         data.contentItems = typeof data.contentItems === 'string' ? JSON.parse(data.contentItems) : data.contentItems;
       }
@@ -67,6 +68,7 @@ import { UpdateNewsStatusDto } from 'src/dto/news/update-news-status.dto';
     )
     async updateNews(@UploadedFiles() files: { 'files[]'?: Express.Multer.File[]; video?: Express.Multer.File[] }, 
     @Body() data: UpdateNewsDto): Promise<GetNewsDto | null> {
+      console.log(data);
       if(data?.contentItems){
         data.contentItems = typeof data.contentItems === 'string' ? JSON.parse(data.contentItems) : data.contentItems;
       }

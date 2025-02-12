@@ -28,11 +28,15 @@ export class BuildController {
     )
   async create(@UploadedFiles() files: { file?: Express.Multer.File[]; icon?: Express.Multer.File[]},
    @Body() data: CreateBuildDto,) {
+    console.log(data);
     if(data?.list){
       data.list = typeof data.list === 'string' ? JSON.parse(data.list) : data.list;
     };
     if(data?.coordinates){
       data.coordinates = typeof data.coordinates === 'string' ? JSON.parse(data.coordinates) : data.coordinates;
+    };
+    if(data?.buildAreaCoordinates){
+      data.buildAreaCoordinates = typeof data.buildAreaCoordinates === 'string' ? JSON.parse(data.buildAreaCoordinates) : data.buildAreaCoordinates;
     };
     const file = files.file ? files?.file[0] : null;
     const icon = files.icon ? files?.icon[0] : null;
@@ -49,13 +53,16 @@ export class BuildController {
   )
   async update(@UploadedFiles() files: { file?: Express.Multer.File[]; icon?: Express.Multer.File[]},
   @Body() data: UpdateBuildDto) {
+    console.log(data);
     if(data?.list){
       data.list = typeof data.list === 'string' ? JSON.parse(data.list) : data.list;
     };
     if(data?.coordinates){
       data.coordinates = typeof data.coordinates === 'string' ? JSON.parse(data.coordinates) : data.coordinates;
     };
-    
+    if(data?.buildAreaCoordinates){
+      data.buildAreaCoordinates = typeof data.buildAreaCoordinates === 'string' ? JSON.parse(data.buildAreaCoordinates) : data.buildAreaCoordinates;
+    };
     const file = files.file ? files?.file[0] : null;
     const icon = files.icon ? files?.icon[0] : null;
     

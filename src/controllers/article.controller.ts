@@ -33,6 +33,7 @@ export class ArticleController {
   )
   async createArticle(@UploadedFiles() files: { 'files[]'?: Express.Multer.File[]; video?: Express.Multer.File[] },
   @Body() data: CreateArticleDto): Promise<GetArticleDto | null> {
+    console.log(data);
     if(data?.contentItems){
       data.contentItems = typeof data.contentItems === 'string' ? JSON.parse(data.contentItems) : data.contentItems;
     }
@@ -65,6 +66,7 @@ export class ArticleController {
   )
   async updateArticle(@UploadedFiles() files: { 'files[]'?: Express.Multer.File[]; video?: Express.Multer.File[] },
    @Body() data: UpdateArticleDto): Promise<GetArticleDto | null> {
+    console.log(data);
     if(data?.contentItems){
       data.contentItems = typeof data.contentItems === 'string' ? JSON.parse(data.contentItems) : data.contentItems;
     }
