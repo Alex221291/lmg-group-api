@@ -31,18 +31,20 @@ import { BuildService } from './services/build.service';
 import { VideoController } from './controllers/video.controller';
 import { ParserService } from './services/parser.service';
 import { ParserController } from './controllers/parser.controller';
-import * as path from 'path';
+import * as iconv from 'iconv-lite';
 
 @Module({
   imports: [
     MulterModule.register({
       storage: diskStorage({
         destination: './uploads',
+        filename: (req, file, callback) => {
+          const decodedName = iconv.decode(Buffer.from(file.originalname, 'latin1'), 'utf-8'); // 🔥 Исправляем кодировку
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(decodedName); // Получаем расширение файла
+          callback(null, `file-${uniqueSuffix}${ext}`);
+        },
       }),
-      fileFilter: (req, file, callback) => {
-        file.originalname = Buffer.from(file.originalname).toString('utf-8');
-        callback(null, true);
-      },
     }),
   ],
   controllers: [ PictureController, AppController, NewsController, MailController, ArticleController, PortfolioController, FeedbackController, SectionController, CategoryController, AreaController, CategoryAreaController, BuildController, VideoController, MailController, ParserController],
