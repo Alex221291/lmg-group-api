@@ -96,7 +96,7 @@ export class NewsService {
         status: data?.status ?? $Enums.ContentSatus.DRAFT,
         time: data?.time,
         videoId: video?.id || null,
-        list: data?.list ? JSON.stringify(data.list) : undefined,
+        list: data?.list ? JSON.stringify(data.list) : null,
         pictureId: mainPicture?.id || null,
       },
     });
@@ -117,7 +117,7 @@ export class NewsService {
           newsId: news?.id,
           text: item?.text,
           pictureId: picture?.id || null,
-          list: item?.list ? JSON.stringify(item.list) : undefined,
+          list: item?.list ? JSON.stringify(item.list) : null,
         }});
     }
     await this.fileService.deleteFiles(filesInfo);
@@ -163,7 +163,7 @@ export class NewsService {
         status: data?.status ?? $Enums.ContentSatus.DRAFT,
         time: data?.time,
         videoId: videoId || null,
-        list: data?.list ? JSON.stringify(data.list) : undefined,
+        list: data?.list ? JSON.stringify(data.list) : null,
         pictureId: pictureId || null,
       },
     });
@@ -192,7 +192,7 @@ export class NewsService {
           newsId: data?.id,
           text: item?.text,
           pictureId: itemPictureId || null,
-          list: item?.list ? JSON.stringify(item.list) : undefined,
+          list: item?.list ? JSON.stringify(item.list) : null,
         }});
     }
     
