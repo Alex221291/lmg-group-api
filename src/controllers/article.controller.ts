@@ -27,12 +27,13 @@ export class ArticleController {
   @Post('create')
   @UseInterceptors(
     FileFieldsInterceptor([
-      { name: 'files[]'},
+      { name: 'files', maxCount: 10 },
       { name: 'video', maxCount: 1 },
     ]),
   )
-  async createArticle(@UploadedFiles() files: { 'files[]'?: Express.Multer.File[]; video?: Express.Multer.File[] },
+  async createArticle(@UploadedFiles() files: { files?: Express.Multer.File[]; video?: Express.Multer.File[] },
   @Body() data: CreateArticleDto): Promise<GetArticleDto | null> {
+    console.log(files?.files);
     console.log(data);
     if(data?.contentItems){
       data.contentItems = typeof data.contentItems === 'string' ? JSON.parse(data.contentItems) : data.contentItems;
@@ -42,7 +43,7 @@ export class ArticleController {
     }
     console.log(files);
     const video = files?.video ? files?.video[0] : null;
-    const filesInfo = files?.['files[]']?.map(file => {
+    const filesInfo = files?.files?.map(file => {
       return {
         path: file?.path,
         name: file?.originalname,
@@ -60,12 +61,13 @@ export class ArticleController {
   @Post('update')
   @UseInterceptors(
     FileFieldsInterceptor([
-      { name: 'files[]', maxCount: 10 },
+      { name: 'files', maxCount: 10 },
       { name: 'video', maxCount: 1 },
     ]),
   )
-  async updateArticle(@UploadedFiles() files: { 'files[]'?: Express.Multer.File[]; video?: Express.Multer.File[] },
+  async updateArticle(@UploadedFiles() files: { files?: Express.Multer.File[]; video?: Express.Multer.File[] },
    @Body() data: UpdateArticleDto): Promise<GetArticleDto | null> {
+    console.log(files?.files);
     console.log(data);
     if(data?.contentItems){
       data.contentItems = typeof data.contentItems === 'string' ? JSON.parse(data.contentItems) : data.contentItems;
@@ -74,7 +76,7 @@ export class ArticleController {
       data.list = typeof data.list === 'string' ? JSON.parse(data.list) : data.list;
     }
 
-    const filesInfo = files?.['files[]']?.map(file => {
+    const filesInfo = files?.files?.map(file => {
       return {
         path: file?.path,
         name: file?.originalname,
