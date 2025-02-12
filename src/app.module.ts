@@ -31,18 +31,19 @@ import { BuildService } from './services/build.service';
 import { VideoController } from './controllers/video.controller';
 import { ParserService } from './services/parser.service';
 import { ParserController } from './controllers/parser.controller';
+import * as path from 'path';
 
 @Module({
   imports: [
-    MulterModule.register({ 
-      storage: diskStorage({ 
-        destination: './uploads', 
-        filename: (req, file, callback) => { 
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9); 
-          const ext = extname(file.originalname); 
-          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`); }, 
-        }), 
+    MulterModule.register({
+      storage: diskStorage({
+        destination: './uploads',
       }),
+      fileFilter: (req, file, callback) => {
+        file.originalname = Buffer.from(file.originalname).toString('utf-8');
+        callback(null, true);
+      },
+    }),
   ],
   controllers: [ PictureController, AppController, NewsController, MailController, ArticleController, PortfolioController, FeedbackController, SectionController, CategoryController, AreaController, CategoryAreaController, BuildController, VideoController, MailController, ParserController],
   providers: [ PrismaService, PictureService, FileService, NewsService, MailService, ArticleService, PortfolioService, FeedbackService, SectionService, CategoryService, AreaService, CategoryAreaService, BuildService, VideoService, MailService, ParserService],

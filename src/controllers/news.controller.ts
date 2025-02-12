@@ -45,6 +45,7 @@ import { UpdateNewsStatusDto } from 'src/dto/news/update-news-status.dto';
       }
       
       const filesInfo = files?.['files[]']?.map(file => {
+        console.log(file.originalname);
         return {
           path: file?.path,
           name: file?.originalname,
