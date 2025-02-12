@@ -44,6 +44,8 @@ export class CategoryService {
       status: item.status,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
+      seoTitle: item?.seoTitle,
+      seoDescription: item?.seoDescription,
       build: item.categoryArea?.flatMap(categoryArea => categoryArea.build.map(build => ({
         id: build.id,
         categoryId: item.id,
@@ -61,7 +63,8 @@ export class CategoryService {
         status: build.status,
         createdAt: build.createdAt,
         updatedAt: build.updatedAt
-      }))) ?? []
+      }))) ?? [],
+      
     }));
   }
   
@@ -93,6 +96,8 @@ export class CategoryService {
       status: answer.status,
       createdAt: answer.createdAt,
       updatedAt: answer.updatedAt,
+      seoTitle: answer?.seoTitle,
+      seoDescription: answer?.seoDescription,
       build: answer.categoryArea.flatMap(categoryArea => categoryArea.build.map(build => ({
         id: build.id,
         categoryId: answer.id,
@@ -139,6 +144,8 @@ export class CategoryService {
         videoId: video?.id || null,
         previewPictureId: previewPicture?.id || null,
         iconPictureId: icon?.id || null,
+        seoTitle: data?.seoTitle,
+        seoDescription: data?.seoDescription,
       },
     });
   }
@@ -210,6 +217,8 @@ export class CategoryService {
         videoId: videoId || null,
         previewPictureId: previewPictureId || null,
         iconPictureId: iconPictureId || null,
+        seoTitle: data?.seoTitle,
+        seoDescription: data?.seoDescription,
       },
     });
   }

@@ -8,4 +8,6 @@ export interface CreateCategoryAreaDto {
   description?: string;
   subTitle?: string;
   status?: $Enums.ContentSatus;
+  seoTitle?: string;
+  seoDescription?: string;
 }

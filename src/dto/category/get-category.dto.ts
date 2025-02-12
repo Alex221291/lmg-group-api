@@ -33,5 +33,7 @@ export interface GetCategoryDto {
         createdAt: Date;
         updatedAt: Date;
     }[];
+    seoTitle?: string;
+    seoDescription?: string;
 }
   

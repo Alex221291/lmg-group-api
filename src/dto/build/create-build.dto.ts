@@ -10,4 +10,6 @@ export interface CreateBuildDto {
   gSubTitle?: string;
   status: $Enums.ContentSatus;
   categoryAreaId?: string;
+  seoTitle?: string;
+  seoDescription?: string;
 }

@@ -7,4 +7,6 @@ export interface CreateCategoryDto {
   sectionId?: string;
   list?: { title?: string; items?: { caption?: string; subcaption?: string }[] };
   status?: $Enums.ContentSatus;
+  seoTitle?: string;
+  seoDescription?: string;
 }

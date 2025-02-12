@@ -13,4 +13,6 @@ export interface UpdateBuildDto {
   status: $Enums.ContentSatus;
   categoryAreaId?: string;
   pictureId?: string;
+  seoTitle?: string;
+  seoDescription?: string;
 }

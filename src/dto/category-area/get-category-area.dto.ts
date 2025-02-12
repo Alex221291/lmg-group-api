@@ -31,5 +31,7 @@ export interface GetCategoryAreaDto {
       title?: string;
       value?: string;
     }[];
+    seoTitle?: string;
+    seoDescription?: string;
   }
   

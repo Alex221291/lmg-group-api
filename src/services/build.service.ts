@@ -46,6 +46,8 @@ export class BuildService {
       updatedAt: build.updatedAt,
       buildAreaCoordinates: build.buildAreaCoordinates ? JSON.parse(build.buildAreaCoordinates as unknown as string) : [],
       iconPictureId: build?.categoryArea?.category?.iconPictureId,
+      seoTitle: build?.seoTitle,
+      seoDescription: build?.seoDescription,
     }));
   }
 
@@ -73,6 +75,8 @@ export class BuildService {
       updatedAt: build.updatedAt,
       buildAreaCoordinates: build.buildAreaCoordinates ? JSON.parse(build.buildAreaCoordinates as unknown as string) : [],
       iconPictureId: build?.categoryArea?.category?.iconPictureId,
+      seoTitle: build?.seoTitle,
+      seoDescription: build?.seoDescription,
     };
   }
 
@@ -93,6 +97,8 @@ export class BuildService {
           buildAreaCoordinates: data?.buildAreaCoordinates ? JSON.stringify(data.buildAreaCoordinates) : null,
           pictureId: picture?.id || null,
           iconPictureId: icon?.id || null,
+          seoTitle: data?.seoTitle,
+          seoDescription: data?.seoDescription,
         }
     });
   }
@@ -135,6 +141,8 @@ export class BuildService {
           buildAreaCoordinates: data?.buildAreaCoordinates ? JSON.stringify(data.buildAreaCoordinates) : null,
           pictureId: pictureId || null,
           iconPictureId: iconId || null,
+          seoTitle: data?.seoTitle,
+          seoDescription: data?.seoDescription,
         }
     });
   }

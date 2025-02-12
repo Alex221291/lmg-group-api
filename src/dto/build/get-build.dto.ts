@@ -16,4 +16,6 @@ export interface GetBuildDto {
     categoryAreaId: string;
     createdAt: Date;
     updatedAt: Date;
+    seoTitle?: string;
+  seoDescription?: string;
   }  
