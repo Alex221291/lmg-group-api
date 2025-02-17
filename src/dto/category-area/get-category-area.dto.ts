@@ -22,10 +22,22 @@ export interface GetCategoryAreaDto {
       updatedAt: Date;
     };
     build: {
-      id: string;
-      name?: string;
-      coordinates: [number, number][];
-      list?: {title?:string, value?: string}[];
+        id: string;
+        categoryId?: string;
+        categoryAreaId?: string;
+        number: number;
+        coordinates? : [number, number][];
+        buildAreaCoordinates?: [number, number][];
+        iconPictureId: string | null;
+        name: string;
+        wDescription: string | null;
+        pictureId: string | null;
+        gTitle: string | null;
+        gSubTitle: string | null;
+        list: {title:string, value: string}[];
+        status: $Enums.ContentSatus;
+        createdAt: Date;
+        updatedAt: Date;
     }[];
     list?: {
       title?: string;

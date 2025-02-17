@@ -62,14 +62,7 @@ export class CategoryAreaService {
       let params: any = {
           include: {
               area: {},
-              build: {
-                  select: {
-                      id: true,
-                      name: true,
-                      coordinates: true,
-                      list: true
-                  }
-              }
+              build: {}
           },
           orderBy: {
               createdAt: 'asc',
@@ -88,6 +81,7 @@ export class CategoryAreaService {
           const parseList = buildItem?.list ? JSON.parse(buildItem?.list as unknown as string) : [];
           if(buildItem?.list) buildItem.list = parseList;
           if(buildItem?.coordinates) buildItem.coordinates = buildItem?.coordinates ? JSON.parse(buildItem?.coordinates as unknown as string) : [];
+          if(buildItem?.buildAreaCoordinates) buildItem.buildAreaCoordinates = buildItem?.buildAreaCoordinates ? JSON.parse(buildItem?.buildAreaCoordinates as unknown as string) : [];
           if (parseList) {
             parseList?.forEach(curr => {
                   if (curr.title) {
