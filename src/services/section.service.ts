@@ -114,12 +114,13 @@ export class SectionService {
       const combinedList = result.build.reduce((acc, buildItem) => {
           if (buildItem.list) {
               buildItem.list.forEach(curr => {
-                  if (curr.title) {
-                      if (!acc[curr.title]) {
-                          acc[curr.title] = { title: curr.title, value: 0 };
-                      }
-                      acc[curr.title].value += parseFloat(curr.value) || 0;
-                  }
+                if (curr.title) {
+                    let title = curr.title === 'Вид носителя' ? 'Количество рекламных площадок' : curr.title;
+                    if (!acc[title]) {
+                        acc[title] = { title: title, value: 0 };
+                    }
+                    acc[title].value += parseFloat(curr.value) || 1;
+                }
               });
           }
           return acc;
@@ -214,10 +215,11 @@ export class SectionService {
             if (buildItem.list) {
                 buildItem.list.forEach(curr => {
                     if (curr.title) {
-                        if (!acc[curr.title]) {
-                            acc[curr.title] = { title: curr.title, value: 0 };
+                        let title = curr.title === 'Вид носителя' ? 'Количество рекламных площадок' : curr.title;
+                        if (!acc[title]) {
+                            acc[title] = { title: title, value: 0 };
                         }
-                        acc[curr.title].value += parseFloat(curr.value) || 0;
+                        acc[title].value += parseFloat(curr.value) || 1;
                     }
                 });
             }
