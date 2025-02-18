@@ -283,7 +283,7 @@ export class ParserService {
       
       await this.prisma.picture.deleteMany({
         where: {
-          id: categoryRecord.pictureId || ''
+          id: categoryRecord.iconPictureId || ''
         }
       });
 
