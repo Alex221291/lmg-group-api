@@ -58,53 +58,56 @@ export class CategoryAreaService {
       });
   }
 
-    async findAll(categoryId?: string): Promise<GetCategoryAreaDto[]> {
-      let params: any = {
-          include: {
-              area: {},
-              build: {}
-          },
-          orderBy: {
-              createdAt: 'asc',
-          }
-      };
-      
-      if (categoryId) {
-          params = { ...params, where: { categoryId } };
-      }
+  async findAll(categoryId?: string): Promise<GetCategoryAreaDto[]> {
+    let params: any = {
+        include: {
+            area: {},
+            build: {}
+        },
+        orderBy: {
+            createdAt: 'asc',
+        }
+    };
 
-      let result : any[] = await this.prisma.categoryArea.findMany(params);
+    if (categoryId) {
+        params = { ...params, where: { categoryId } };
+    }
 
-      return result?.map(item => {
-          // Объединение и суммирование значений list из всех build
+    let result: any[] = await this.prisma.categoryArea.findMany(params);
+
+    return await Promise.all(result.map(async (item) => {
+        const category = await this.prisma.category.findUnique({ where: { id: item.categoryId } });
+
+        // Объединение и суммирование значений list из всех build
         const combinedList = item.build?.reduce((acc, buildItem) => {
-          const parseList = buildItem?.list ? JSON.parse(buildItem?.list as unknown as string) : [];
-          if(buildItem?.list) buildItem.list = parseList;
-          if(buildItem?.coordinates) buildItem.coordinates = buildItem?.coordinates ? JSON.parse(buildItem?.coordinates as unknown as string) : [];
-          if(buildItem?.buildAreaCoordinates) buildItem.buildAreaCoordinates = buildItem?.buildAreaCoordinates ? JSON.parse(buildItem?.buildAreaCoordinates as unknown as string) : [];
-          if (parseList) {
-            parseList?.forEach(curr => {
-                  if (curr.title) {
-                      let title = curr.title === 'Вид носителя' ? 'Количество рекламных площадок' : curr.title;
-                      if (!acc[title]) {
-                          acc[title] = { title: title, value: 0 };
-                      }
-                      acc[title].value += parseFloat(curr.value) || 1;
-                  }
-              });
-          }
-          return acc;
+            const parseList = buildItem?.list ? JSON.parse(buildItem?.list as unknown as string) : [];
+            if (buildItem?.list) buildItem.list = parseList;
+            if (buildItem?.coordinates) buildItem.coordinates = buildItem?.coordinates ? JSON.parse(buildItem?.coordinates as unknown as string) : [];
+            if (buildItem?.buildAreaCoordinates) buildItem.buildAreaCoordinates = buildItem?.buildAreaCoordinates ? JSON.parse(buildItem?.buildAreaCoordinates as unknown as string) : [];
+            buildItem.iconPictureId = category.iconPictureId;
+            if (parseList) {
+                parseList?.forEach(curr => {
+                    if (curr.title) {
+                        let title = curr.title === 'Вид носителя' ? 'Количество рекламных площадок' : curr.title;
+                        if (!acc[title]) {
+                            acc[title] = { title: title, value: 0 };
+                        }
+                        acc[title].value += parseFloat(curr.value) || 1;
+                    }
+                });
+            }
+            return acc;
         }, {});
 
-          // Преобразование combinedList в массив
-          const summedList = Object.values(combinedList);
+        // Преобразование combinedList в массив
+        const summedList = Object.values(combinedList);
 
-          return {
-              ...item,
-              list: summedList
-          };
-      });
-  }
+        return {
+            ...item,
+            list: summedList
+        };
+    }));
+}
 
   async findOne(id: string) {
     return await this.prisma.categoryArea.findUnique({ where: { id },
