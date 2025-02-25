@@ -27,6 +27,7 @@ export class ParserService {
     }
 
     const groupData = await this.transformData(headers, data);
+    
     let updatedCount = 0;
     let addedCount = 0;
     const processedBuildIds: Set<string> = new Set();
@@ -65,25 +66,25 @@ export class ParserService {
     return {message: `Данные успешно загружены\nДобавлено: ${addedCount}\n Обновлено: ${updatedCount}\n Архив: ${archivedCount}`};
   }
 
-  async parserFile(filePath: string): Promise<any> { //Promise<ParserDto[] | []>
+  async parserFile(filePath: string): Promise<any> {
     const fileBuffer = fs.readFileSync(filePath); // Читаем файл как буфер
     const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
     const worksheet = workbook.Sheets['Юниты'];
-    
+  
     if (!worksheet) {
-      throw new ApiError({error: 'Лист "Юниты" не найден в файле.'});
+      throw new ApiError({ error: 'Лист "Юниты" не найден в файле.' });
     }
-
+  
     // Парсим данные, включая заголовки
     const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: null });
-
+  
     if (jsonData.length <= 1) {
-      throw new ApiError({error: 'Лист "Юниты" пустой.'});
+      throw new ApiError({ error: 'Лист "Юниты" пустой.' });
     }
-
+  
     // Первая строка будет заголовками
     const headers = jsonData[0];
-    
+  
     const columnNames = [
       "section",
       "category",
@@ -103,14 +104,14 @@ export class ParserService {
       "gDescription",
       "iconLink"
     ];
-
+  
     // Пропускаем первую строку с заголовками
     const parsedData = jsonData.slice(1).map((row: any[]) => {
       const parsedRow: any = {};
       row.forEach((cell, index) => {
         parsedRow[columnNames[index]] = cell !== null ? String(cell).trim().replace(/\s+/g, ' ') : cell;
       });
-
+  
       // Преобразование buildAreaCoordinates к формату [number, number][]
       if (parsedRow.buildAreaCoordinates && parsedRow.buildAreaCoordinates.length > 0) {
         parsedRow.buildAreaCoordinates = parsedRow.buildAreaCoordinates.split('][')
@@ -119,15 +120,18 @@ export class ParserService {
             return [lat, lon];
           });
       }
-      return parsedRow;
-    });
-
-    
+  
+      // Фильтрация: если все значения в parsedRow равны null или пустые строки, то исключаем эту запись
+      const hasValidData = Object.values(parsedRow).some(value => value !== null && value !== '');
+  
+      return hasValidData ? parsedRow : null; // Возвращаем только непустые строки
+    }).filter(row => row !== null); // Убираем все null записи
+  
     return {
       headers,
       data: parsedData
     };
-  }
+  }  
 
   async validateData(headers: any, data: any[]): Promise<string[]> {
     const errors: string[] = [];
@@ -224,19 +228,22 @@ export class ParserService {
           coordinates: []
         };
       }
-      if(row.advertisingType || row.itemCount || row.audienceReach){
+      if (row.advertisingType && row.itemCount && row.audienceReach) {
         groupedData[key].list.push({ 
           title: headers[10],
-          value: row?.advertisingType });
-
+          value: row?.advertisingType 
+        });
+      
         groupedData[key].list.push({ 
           title: headers[11],
-          value: row?.itemCount });
-
+          value: row?.itemCount ? Math.ceil(row.itemCount) : row?.itemCount  // Округляем itemCount
+        });
+      
         groupedData[key].list.push({ 
           title: headers[12],
-          value: row?.audienceReach });
-      }
+          value: row?.audienceReach ? Math.ceil(row.audienceReach) : row?.audienceReach  // Округляем audienceReach
+        });
+      }      
       if(row.lat && row.lon)
         groupedData[key].coordinates.push([row.lat, row.lon]);
 
