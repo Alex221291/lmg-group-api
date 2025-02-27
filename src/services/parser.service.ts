@@ -48,7 +48,7 @@ export class ParserService {
       }
     }
     
-    const archivedCount = await this.archiveOldBuilds(processedBuildIds);
+    //const archivedCount = await this.archiveOldBuilds(processedBuildIds);
 
     // Получение текущей даты в формате ddmmyyyy
     const currentDate = new Date();
@@ -63,7 +63,7 @@ export class ParserService {
     // Переименование и сохранение файла
     await this.renameAndSaveFile(fileInfo?.path, destinationPath);
 
-    return {message: `Данные успешно загружены\nДобавлено: ${addedCount}\n Обновлено: ${updatedCount}\n Архив: ${archivedCount}`};
+    return {message: `Данные успешно загружены\nДобавлено: ${addedCount}\n Обновлено: ${updatedCount}`}; //\n Архив: ${archivedCount}
   }
 
   async parserFile(filePath: string): Promise<any> {
@@ -228,7 +228,7 @@ export class ParserService {
           coordinates: []
         };
       }
-      if (row.advertisingType && row.itemCount && row.audienceReach) {
+      if (row.advertisingType && row.itemCount && row.audienceReach && groupedData[key].length < 3) {
         groupedData[key].list.push({ 
           title: headers[10],
           value: row?.advertisingType 
