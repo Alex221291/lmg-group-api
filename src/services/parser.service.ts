@@ -228,7 +228,7 @@ export class ParserService {
           coordinates: []
         };
       }
-      if (row.advertisingType && row.itemCount && row.audienceReach && groupedData[key].length < 3) {
+      if (row.advertisingType && row.itemCount && row.audienceReach && groupedData[key].list.length < 3) {
         groupedData[key].list.push({ 
           title: headers[10],
           value: row?.advertisingType 
