@@ -61,7 +61,7 @@ export class CategoryAreaService {
   async findAll(categoryId?: string): Promise<GetCategoryAreaDto[]> {
     let params: any = {
         include: {
-            area: {where: {status: $Enums.ContentSatus.PUBLISHED}},
+            area: true,
             build: {where: {status: $Enums.ContentSatus.PUBLISHED}}
         },
         orderBy: {
