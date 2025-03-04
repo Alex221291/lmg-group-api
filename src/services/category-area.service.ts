@@ -5,8 +5,8 @@ import { UpdateCategoryAreaDto } from 'src/dto/category-area/update-category-are
 import { UpdateCategoryAreaStatusDto } from 'src/dto/category-area/update-category-area-status.dto';
 import { FileService } from './file.service';
 import { createReadStream } from 'fs';
-import { buildMessage } from 'class-validator';
 import { GetCategoryAreaDto } from 'src/dto/category-area/get-category-area.dto';
+import { $Enums } from '@prisma/client';
 
 @Injectable()
 export class CategoryAreaService {
@@ -61,8 +61,8 @@ export class CategoryAreaService {
   async findAll(categoryId?: string): Promise<GetCategoryAreaDto[]> {
     let params: any = {
         include: {
-            area: {},
-            build: {}
+            area: {where: {status: $Enums.ContentSatus.PUBLISHED}},
+            build: {where: {status: $Enums.ContentSatus.PUBLISHED}}
         },
         orderBy: {
             createdAt: 'asc',
