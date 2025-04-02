@@ -17,5 +17,6 @@ export interface GetBuildDto {
     createdAt: Date;
     updatedAt: Date;
     seoTitle?: string;
-  seoDescription?: string;
+    seoDescription?: string;
+    urlTitle?: string;
   }  

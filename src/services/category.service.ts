@@ -7,6 +7,7 @@ import { Category, Prisma } from '@prisma/client';
 import { UpdateCategoryDto } from 'src/dto/category/update-category.dto';
 import { UpdateCategoryStatusDto } from 'src/dto/category/update-category-status.dto';
 import { createReadStream } from 'fs';
+import { TransliterateService } from 'src/engine/transliterate.service';
 
 @Injectable()
 export class CategoryService {
@@ -46,6 +47,7 @@ export class CategoryService {
       updatedAt: item.updatedAt,
       seoTitle: item?.seoTitle,
       seoDescription: item?.seoDescription,
+      urlTitle: new TransliterateService().transliterateText(item.title),
       build: item.categoryArea?.flatMap(categoryArea => categoryArea.build.map(build => ({
         id: build.id,
         categoryId: item.id,
@@ -98,6 +100,7 @@ export class CategoryService {
       updatedAt: answer.updatedAt,
       seoTitle: answer?.seoTitle,
       seoDescription: answer?.seoDescription,
+      urlTitle: new TransliterateService().transliterateText(answer.title),
       build: answer.categoryArea.flatMap(categoryArea => categoryArea.build.map(build => ({
         id: build.id,
         categoryId: answer.id,

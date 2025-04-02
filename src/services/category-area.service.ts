@@ -7,6 +7,7 @@ import { FileService } from './file.service';
 import { createReadStream } from 'fs';
 import { GetCategoryAreaDto } from 'src/dto/category-area/get-category-area.dto';
 import { $Enums } from '@prisma/client';
+import { TransliterateService } from 'src/engine/transliterate.service';
 
 @Injectable()
 export class CategoryAreaService {
@@ -104,16 +105,22 @@ export class CategoryAreaService {
 
         return {
             ...item,
+            urlTitle: new TransliterateService().transliterateText(item.area.name),
             list: summedList
         };
     }));
 }
 
   async findOne(id: string) {
-    return await this.prisma.categoryArea.findUnique({ where: { id },
+    var result = await this.prisma.categoryArea.findUnique({ where: { id },
       include: {
         area: {},
       }, });
+
+      return {
+        ...result,
+        urlTitle: new TransliterateService().transliterateText(result.area.name),
+    };
   }
 
   async create(fileInfo?: {path?: string, name?: string, type?: string}, data?: CreateCategoryAreaDto) {

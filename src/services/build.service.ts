@@ -6,6 +6,7 @@ import { UpdateBuildStatusDto } from 'src/dto/build/update-build-status.dto';
 import { FileService } from './file.service';
 import { createReadStream } from 'fs';
 import { UpdateBuildDto } from 'src/dto/build/update-build.dto';
+import { TransliterateService } from 'src/engine/transliterate.service';
 
 @Injectable()
 export class BuildService {
@@ -48,6 +49,7 @@ export class BuildService {
       iconPictureId: build?.categoryArea?.category?.iconPictureId,
       seoTitle: build?.seoTitle,
       seoDescription: build?.seoDescription,
+      urlTitle: new TransliterateService().transliterateText(build.name),
     }));
   }
 
@@ -77,6 +79,7 @@ export class BuildService {
       iconPictureId: build?.categoryArea?.category?.iconPictureId,
       seoTitle: build?.seoTitle,
       seoDescription: build?.seoDescription,
+      urlTitle: new TransliterateService().transliterateText(build.name),
     };
   }
 

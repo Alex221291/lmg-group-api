@@ -35,5 +35,6 @@ export interface GetCategoryDto {
     }[];
     seoTitle?: string;
     seoDescription?: string;
+    urlTitle?: string;
 }
   
