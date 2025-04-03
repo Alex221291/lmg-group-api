@@ -14,6 +14,8 @@ export interface GroupParserDto {
     gTitle?: string;
     gDescription?: string;
     iconLink?: string;
+    seoTitle?: string;
+    seoDescription?: string;
 }
 
   

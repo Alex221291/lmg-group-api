@@ -102,7 +102,9 @@ export class ParserService {
       "gPictureLink",
       "gTitle",
       "gDescription",
-      "iconLink"
+      "iconLink",
+      "seoTitle",
+      "seoDescription",
     ];
   
     // Пропускаем первую строку с заголовками
@@ -256,6 +258,11 @@ export class ParserService {
         groupedData[key].gDescription = row.gDescription;
         groupedData[key].iconLink = row.iconLink;
       }
+
+      if (row.seoTitle && row.seoDescription) {
+        groupedData[key].seoTitle = row.seoTitle;
+        groupedData[key].seoDescription = row.seoDescription;
+      }
     });
 
     // Преобразуем groupedData в массив
@@ -360,7 +367,9 @@ export class ParserService {
         list: item?.list ? JSON.stringify(item.list) : null,
         pictureId: pictureId,
         iconPictureId: iconPictureId,
-        status: $Enums.ContentSatus.PUBLISHED
+        status: $Enums.ContentSatus.PUBLISHED,
+        seoTitle: item.seoTitle,
+        seoDescription: item.seoDescription,
       }
     });
   }
@@ -382,7 +391,9 @@ export class ParserService {
         list: item?.list ? JSON.stringify(item.list) : null,
         pictureId: pictureId,
         iconPictureId: iconPictureId,
-        status: $Enums.ContentSatus.PUBLISHED
+        status: $Enums.ContentSatus.PUBLISHED,
+        seoTitle: item.seoTitle,
+        seoDescription: item.seoDescription,
       }
     });
   }
