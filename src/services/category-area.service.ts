@@ -86,6 +86,9 @@ export class CategoryAreaService {
             if (buildItem?.coordinates) buildItem.coordinates = buildItem?.coordinates ? JSON.parse(buildItem?.coordinates as unknown as string) : [];
             if (buildItem?.buildAreaCoordinates) buildItem.buildAreaCoordinates = buildItem?.buildAreaCoordinates ? JSON.parse(buildItem?.buildAreaCoordinates as unknown as string) : [];
             buildItem.iconPictureId = category.iconPictureId;
+            buildItem.urlBuild = new TransliterateService().transliterateText(buildItem.name);
+            buildItem.urlCategory = new TransliterateService().transliterateText(category.title);
+            buildItem.urlCategoryArea = new TransliterateService().transliterateText(item.area.name);
             if (parseList) {
                 parseList?.forEach(curr => {
                     if (curr.title) {

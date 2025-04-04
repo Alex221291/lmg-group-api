@@ -5,6 +5,7 @@ import { GetSectionDto } from 'src/dto/section/get-section.dto';
 import { GetSectionMapDto } from 'src/dto/section/get-section-map.dto';
 import { GetPortfolioDto } from 'src/dto/portfolio/get-portfolio.dto';
 import { $Enums } from '@prisma/client';
+import { TransliterateService } from 'src/engine/transliterate.service';
 
 @Injectable()
 export class SectionService {
@@ -40,6 +41,7 @@ export class SectionService {
                       categoryArea: {
                         where: { status: $Enums.ContentSatus.PUBLISHED },
                           include: {
+                            area: {},
                               build: {
                                 where: { status: $Enums.ContentSatus.PUBLISHED },
                                 //   select: {
@@ -105,6 +107,9 @@ export class SectionService {
                     createdAt: buildItem.createdAt,
                     updatedAt: buildItem.updatedAt,
                     status: buildItem. status,
+                    urlBuild: new TransliterateService().transliterateText(buildItem.name),
+                    urlCategory: new TransliterateService().transliterateText(cat.title),
+                    urlCategoryArea: new TransliterateService().transliterateText(area.area.name),
                   });
               });
           });

@@ -38,6 +38,9 @@ export interface GetCategoryAreaDto {
         status: $Enums.ContentSatus;
         createdAt: Date;
         updatedAt: Date;
+        urlBuild?: string;
+        urlCategory?: string;
+        urlCategoryArea?: string;
     }[];
     list?: {
       title?: string;
