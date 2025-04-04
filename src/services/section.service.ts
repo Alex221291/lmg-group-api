@@ -147,6 +147,7 @@ export class SectionService {
                     categoryArea: {
                         where: { status: $Enums.ContentSatus.PUBLISHED },
                         include: {
+                            area:{},
                             build: {
                                 where: { status: $Enums.ContentSatus.PUBLISHED },
                                 // select: {
@@ -210,6 +211,9 @@ export class SectionService {
                         createdAt: buildItem.createdAt,
                         updatedAt: buildItem.updatedAt,
                         status: buildItem. status,
+                        urlBuild: new TransliterateService().transliterateText(buildItem.name),
+                        urlCategory: new TransliterateService().transliterateText(cat.title),
+                        urlCategoryArea: new TransliterateService().transliterateText(area.area.name),
                     });
                 });
             });
