@@ -7,6 +7,8 @@ import { createReadStream } from 'fs';
 import { FileService } from './file.service';
 import { UpdateNewsDto } from '../dto/news/update-news.dto';
 import { UpdateNewsStatusDto } from 'src/dto/news/update-news-status.dto';
+import { TransliterateService } from 'src/engine/transliterate.service';
+
 @Injectable()
 export class NewsService {
   constructor(private prisma: PrismaService, 
@@ -44,6 +46,7 @@ export class NewsService {
         pictureId: item.pictureId,
         list: item.list ? JSON.parse(item.list as unknown as string) : null,
       })),
+      urlTitle: new TransliterateService().transliterateText(answer.title),
     };
 
     return getNewsDto;
@@ -81,6 +84,7 @@ export class NewsService {
           pictureId: item.pictureId,
           list: item.list ? JSON.parse(item.list as unknown as string) : null,
         })),
+        urlTitle: new TransliterateService().transliterateText(item.title),
       }
     })
   }

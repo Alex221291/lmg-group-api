@@ -13,6 +13,7 @@ export interface GetNewsDto {
     updatedAt?: Date;
     status: $Enums.ContentSatus;
     contentItems?: GetItemDto[];
+    urlTitle?: string;
 }
 
 export interface GetItemDto {

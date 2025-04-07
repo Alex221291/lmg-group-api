@@ -14,4 +14,5 @@ export interface GetArticleDto {
     list?: GetListDto[];
     status: $Enums.ContentSatus;
     contentItems?: GetItemDto[];
+    urlTitle?: string;
 }

@@ -7,6 +7,8 @@ import { GetArticleDto } from 'src/dto/article/get-article.dto';
 import { CreateArticleDto } from 'src/dto/article/create-article.dto';
 import { UpdateArticleDto } from 'src/dto/article/update-article.dto';
 import { UpdateArticleStatusDto } from 'src/dto/article/update-article-status.dto';
+import { TransliterateService } from 'src/engine/transliterate.service';
+
 @Injectable()
 export class ArticleService {
   constructor(private prisma: PrismaService, 
@@ -44,6 +46,7 @@ export class ArticleService {
         pictureId: item.pictureId,
         list: item.list ? JSON.parse(item.list as unknown as string) : null,
       })),
+      urlTitle: new TransliterateService().transliterateText(answer.title),
     };
 
     return getArticleDto;
@@ -81,6 +84,7 @@ export class ArticleService {
           pictureId: item.pictureId,
           list: item.list ? JSON.parse(item.list as unknown as string) : undefined,
         })),
+        urlTitle: new TransliterateService().transliterateText(item.title),
       }
     })
   }
