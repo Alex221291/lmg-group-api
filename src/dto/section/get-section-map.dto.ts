@@ -8,6 +8,7 @@ export interface GetSectionMapDto {
     status?: $Enums.ContentSatus;
     createdAt?: Date;
     updatedAt?: Date;
+    urlTitle?: string;
     build: {
         id: string;
         categoryId?: string;

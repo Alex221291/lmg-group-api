@@ -71,6 +71,7 @@ export class SectionService {
           status: section.status,
           createdAt: section.createdAt,
           updatedAt: section.updatedAt,
+          urlTitle: new TransliterateService().transliterateText(section.title),
           build: [],
           list: []
       };
@@ -174,6 +175,7 @@ export class SectionService {
             status: section.status,
             createdAt: section.createdAt,
             updatedAt: section.updatedAt,
+            urlTitle: new TransliterateService().transliterateText(section.title),
             build: [],
             list: []
         };
