@@ -1,0 +1,16 @@
+services:
+  lgm.backend:
+    container_name: lgm.backend
+    hostname: lgm.backend
+    image: lgm.backend
+#    ports:
+#      - 3000:3000
+    restart: unless-stopped
+    networks:
+      lmg-network:
+        ipv4_address: "10.77.20.5"
+        
+
+networks:
+  lmg-network:
+    external: true

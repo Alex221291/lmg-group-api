@@ -3,9 +3,8 @@ WORKDIR /usr/src/app
 COPY . .
 RUN npm install
 
-ARG PORT=5000 
+ARG PORT=5000
 
 EXPOSE ${PORT}
 
 CMD ["npm", "run", "start"]
-
