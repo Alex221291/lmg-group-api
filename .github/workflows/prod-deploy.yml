@@ -92,7 +92,7 @@ jobs:
         echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env
         echo MAIN_EMAIL=${{ secrets.MAIN_EMAIL }} >> .env
         echo SMTP_EMAIL=${{ secrets.SMTP_EMAIL }} >> .env
-        echo SMTP_PASSWORD=${{ secrets.H0aX5v3ATg32EsGQGQWb }} >> .env
+        echo SMTP_PASSWORD=${{ secrets.SMTP_PASSWORD }} >> .env
 
         docker compose pull
         docker compose up -d
