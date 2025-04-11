@@ -1,8 +1,8 @@
 services:
-  lgm.backend:
-    container_name: lgm.backend
-    hostname: lgm.backend
-    image: lgm.backend
+  lmg.backend:
+    container_name: lmg.backend
+    hostname: lmg.backend
+    image: lmg.backend
 #    ports:
 #      - 3000:3000
     restart: unless-stopped
