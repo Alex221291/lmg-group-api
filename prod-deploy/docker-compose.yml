@@ -2,9 +2,11 @@ services:
   lmg.backend:
     container_name: lmg.backend
     hostname: lmg.backend
+    image: lmg.backend
     env_file:
       - ./.env
-    image: lmg.backend
+    volumes:
+      - ${HOME}/lgm.uploads:/usr/src/app/uploads
 #    ports:
 #      - 3000:3000
     restart: unless-stopped
