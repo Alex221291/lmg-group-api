@@ -1,0 +1,20 @@
+services:
+  lmg.backend:
+    container_name: lmg.backend
+    hostname: lmg.backend
+    image: lmg.backend
+    env_file:
+      - ./.env
+    volumes:
+      - ${HOME}/lgm.uploads:/usr/src/app/uploads
+#    ports:
+#      - 3000:3000
+    restart: unless-stopped
+    networks:
+      lmg-network:
+        ipv4_address: "10.77.20.5"
+        
+
+networks:
+  lmg-network:
+    external: true
