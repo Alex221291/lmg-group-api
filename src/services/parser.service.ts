@@ -82,8 +82,10 @@ export class ParserService {
         });
     
         if (buildRecord) {
+          addedCount++;
           await this.updateBuild(buildRecord.id, item);
         } else {
+          updatedCount++;
           await this.createBuild(categoryAreaRecord.id, item);
         }
       }));
