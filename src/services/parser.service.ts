@@ -257,9 +257,6 @@ export class ParserService {
         groupedData[key].gTitle = row.gTitle;
         groupedData[key].gDescription = row.gDescription;
         groupedData[key].iconLink = row.iconLink;
-      }
-
-      if (row.seoTitle && row.seoDescription) {
         groupedData[key].seoTitle = row.seoTitle;
         groupedData[key].seoDescription = row.seoDescription;
       }
