@@ -23,6 +23,7 @@ export class ParserService {
     const validationErrors = await this.validateData(headers, data);
     if (validationErrors.length > 0) {
       await this.fileService.deleteFile(fileInfo?.path);
+      console.log(validationErrors);
       throw new ApiError({errors: validationErrors});
     }
 
@@ -62,7 +63,7 @@ export class ParserService {
 
     // Переименование и сохранение файла
     await this.renameAndSaveFile(fileInfo?.path, destinationPath);
-
+    console.log({message: `Данные успешно загружены\nДобавлено: ${addedCount}\n Обновлено: ${updatedCount}`});
     return {message: `Данные успешно загружены\nДобавлено: ${addedCount}\n Обновлено: ${updatedCount}`}; //\n Архив: ${archivedCount}
   }
 
