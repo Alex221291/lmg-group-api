@@ -8,6 +8,9 @@ import { $Enums } from '@prisma/client';
 import fetch from 'node-fetch';
 import { FileService } from './file.service';
 
+const imageCache = new Map<string, string>();
+const updatedCategoryIcon = new Set<string>();
+
 @Injectable()
 export class ParserService {
 
@@ -30,21 +33,64 @@ export class ParserService {
     let addedCount = 0;
     const processedBuildIds: Set<string> = new Set();
     //create/update
-    for (const item of groupData) {
-      const { section, category, area, build } = item;
-
-      const existingData = await this.findAndUpsert(section, category, area, build, item);
-
-      if (existingData.buildId) {
-        await this.updateBuild(existingData.buildId, item);
-        updatedCount++;
-        processedBuildIds.add(existingData.buildId);
-      } else {
-        const createdBuild = await this.createBuild(existingData.categoryAreaId, item);
-        addedCount++;
-        processedBuildIds.add(createdBuild.id);
-      }
+    const sections = await this.prisma.section.findMany();
+    const categories = await this.prisma.category.findMany();
+    const areas = await this.prisma.area.findMany();
+    const categoryAreas = await this.prisma.categoryArea.findMany();
+    
+    const sectionMap = new Map(sections.map(s => [s.title, s]));
+    const categoryMap = new Map(categories.map(c => [`${c.title}_${c.sectionId}`, c]));
+    const areaMap = new Map(areas.map(a => [a.name, a]));
+    const categoryAreaMap = new Map(categoryAreas.map(ca => [`${ca.categoryId}_${ca.areaId}`, ca]));
+    
+    
+    const chunkSize = 20;
+    const results: any[] = [];
+    
+    for (let i = 0; i < groupData.length; i += chunkSize) {
+      const chunk = groupData.slice(i, i + chunkSize);
+    
+      const chunkResults = await Promise.allSettled(chunk.map(async (item) => {
+        const { section, category, area, build, iconLink } = item;
+    
+        const sectionRecord = sectionMap.get(section);
+        if (!sectionRecord) return;
+    
+        const categoryKey = `${category}_${sectionRecord.id}`;
+        const categoryRecord = categoryMap.get(categoryKey);
+        if (!categoryRecord) return;
+    
+        const areaRecord = areaMap.get(area);
+        if (!areaRecord) return;
+    
+        const catAreaKey = `${categoryRecord.id}_${areaRecord.id}`;
+        const categoryAreaRecord = categoryAreaMap.get(catAreaKey);
+        if (!categoryAreaRecord) return;
+    
+        // Обновление иконки категории (один раз)
+        if (iconLink && !updatedCategoryIcon.has(categoryRecord.id)) {
+          const iconPictureId = await this.downloadImageWithCache(iconLink);
+          if (iconPictureId) {
+            await this.prisma.picture.deleteMany({ where: { id: categoryRecord.iconPictureId || '' } });
+            await this.prisma.category.update({ where: { id: categoryRecord.id }, data: { iconPictureId } });
+            updatedCategoryIcon.add(categoryRecord.id);
+          }
+        }
+    
+        const buildRecord = await this.prisma.build.findFirst({
+          where: { categoryAreaId: categoryAreaRecord.id, name: build }
+        });
+    
+        if (buildRecord) {
+          await this.updateBuild(buildRecord.id, item);
+        } else {
+          await this.createBuild(categoryAreaRecord.id, item);
+        }
+      }));
+    
+      results.push(...chunkResults);
     }
+
     
     //const archivedCount = await this.archiveOldBuilds(processedBuildIds);
 
@@ -333,50 +379,22 @@ export class ParserService {
       : { buildId: null, categoryAreaId: categoryAreaRecord.id };
   }
 
-  async updateBuild(buildId: string, item: GroupParserDto): Promise<any> {
-
-    const updateItem = await this.prisma.build.findFirst({where: {id: buildId }});
-    await this.prisma.picture.deleteMany({
-      where : {
-        id: updateItem?.pictureId || ''
-      }
-    });
-
-    await this.prisma.picture.deleteMany({
-      where : {
-        id: updateItem?.iconPictureId || ''
-      }
-    });
-
-    const pictureId = await this.downloadAndSaveImage(item.gPictureLink);
-    const iconPictureId = await this.downloadAndSaveImage(item.iconLink);
-
+  async updateBuild(buildId: string, item: GroupParserDto) {
+    const updateItem = await this.prisma.build.findFirst({ where: { id: buildId } });
+  
+    if (updateItem?.pictureId) {
+      await this.prisma.picture.delete({ where: { id: updateItem.pictureId } });
+    }
+    if (updateItem?.iconPictureId) {
+      await this.prisma.picture.delete({ where: { id: updateItem.iconPictureId } });
+    }
+  
+    const pictureId = await this.downloadImageWithCache(item.gPictureLink);
+    const iconPictureId = await this.downloadImageWithCache(item.iconLink);
+  
     return this.prisma.build.update({
       where: { id: buildId },
       data: {
-        wDescription: item.wDescription,
-        gTitle: item.gTitle,
-        gSubTitle: item.gDescription,
-        coordinates: item?.coordinates ? JSON.stringify(item.coordinates) : null,
-        buildAreaCoordinates: item?.buildAreaCoordinates ? JSON.stringify(item.buildAreaCoordinates) : null,
-        list: item?.list ? JSON.stringify(item.list) : null,
-        pictureId: pictureId,
-        iconPictureId: iconPictureId,
-        status: $Enums.ContentSatus.PUBLISHED,
-        seoTitle: item.seoTitle,
-        seoDescription: item.seoDescription,
-      }
-    });
-  }
-
-  async createBuild(categoryAreaId: string, item: GroupParserDto): Promise<any> {
-
-    const pictureId = await this.downloadAndSaveImage(item.gPictureLink);
-    const iconPictureId = await this.downloadAndSaveImage(item.iconLink);
-
-    return this.prisma.build.create({
-      data: {
-        categoryAreaId: categoryAreaId,
         name: item.build,
         wDescription: item.wDescription,
         gTitle: item.gTitle,
@@ -384,12 +402,36 @@ export class ParserService {
         coordinates: item?.coordinates ? JSON.stringify(item.coordinates) : null,
         buildAreaCoordinates: item?.buildAreaCoordinates ? JSON.stringify(item.buildAreaCoordinates) : null,
         list: item?.list ? JSON.stringify(item.list) : null,
-        pictureId: pictureId,
-        iconPictureId: iconPictureId,
+        pictureId,
+        iconPictureId,
         status: $Enums.ContentSatus.PUBLISHED,
         seoTitle: item.seoTitle,
         seoDescription: item.seoDescription,
-      }
+      },
+    });
+  }
+  
+  // Создание записи
+  async createBuild(categoryAreaId: string, item: GroupParserDto) {
+    const pictureId = await this.downloadImageWithCache(item.gPictureLink);
+    const iconPictureId = await this.downloadImageWithCache(item.iconLink);
+  
+    return this.prisma.build.create({
+      data: {
+        categoryAreaId,
+        name: item.build,
+        wDescription: item.wDescription,
+        gTitle: item.gTitle,
+        gSubTitle: item.gDescription,
+        coordinates: item?.coordinates ? JSON.stringify(item.coordinates) : null,
+        buildAreaCoordinates: item?.buildAreaCoordinates ? JSON.stringify(item.buildAreaCoordinates) : null,
+        list: item?.list ? JSON.stringify(item.list) : null,
+        pictureId,
+        iconPictureId,
+        status: $Enums.ContentSatus.PUBLISHED,
+        seoTitle: item.seoTitle,
+        seoDescription: item.seoDescription,
+      },
     });
   }
 
@@ -413,6 +455,29 @@ export class ParserService {
       return savedPicture.id;
     } catch (error) {
       console.error(`Failed to download or save image from URL: ${url}`, error);
+      return null;
+    }
+  }
+
+  async downloadImageWithCache(url: string): Promise<string | null> {
+    if (!url) return null;
+    if (imageCache.has(url)) return imageCache.get(url)!;
+  
+    try {
+      const response = await fetch(url);
+      if (!response.ok) return null;
+  
+      const buffer = await response.buffer();
+      const savedPicture = await this.prisma.picture.create({
+        data: {
+          picture: buffer,
+          name: url,
+          type: response.headers.get('content-type') || 'image/png',
+        },
+      });
+      imageCache.set(url, savedPicture.id);
+      return savedPicture.id;
+    } catch {
       return null;
     }
   }
