@@ -1,15 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import * as XLSX from 'xlsx';
 import * as fs from 'fs';
-import * as path from 'path';
-import { ParserDto } from 'src/dto/parser/parser.dto';
 import { GroupParserDto } from 'src/dto/parser/group-parser.dto';
 import { PrismaService } from './prisma.service';
 import { ApiError } from 'src/engine/api-error';
 import { $Enums } from '@prisma/client';
 import fetch from 'node-fetch';
 import { FileService } from './file.service';
-import { contains } from 'class-validator';
 
 @Injectable()
 export class ParserService {
@@ -138,60 +135,101 @@ export class ParserService {
 
   async validateData(headers: any, data: any[]): Promise<string[]> {
     const errors: string[] = [];
-    
+  
+    // --- 1. Сбор всех уникальных значений из входных данных
+    const sectionTitles = new Set<string>();
+    const categoryKeys = new Set<string>(); // `${sectionTitle}::${categoryTitle}`
+    const areaNames = new Set<string>();
+    const categoryAreaKeys = new Set<string>(); // `${categoryId}::${areaId}`
+  
+    for (const row of data) {
+      sectionTitles.add(row.section);
+      areaNames.add(row.area);
+    }
+  
+    // Загружаем все секции
+    const sections = await this.prisma.section.findMany({
+      where: { title: { in: [...sectionTitles] } }
+    });
+    const sectionMap = new Map(sections.map(s => [s.title, s]));
+  
+    // Загружаем все категории для нужных секций
+    const categories = await this.prisma.category.findMany({
+      where: { sectionId: { in: sections.map(s => s.id) } }
+    });
+    const categoryMap = new Map(
+      categories.map(c => [`${sections.find(s => s.id === c.sectionId)?.title}::${c.title}`, c])
+    );
+  
+    // Загружаем все районы
+    const areas = await this.prisma.area.findMany({
+      where: { name: { in: [...areaNames] } }
+    });
+    const areaMap = new Map(areas.map(a => [a.name, a]));
+  
+    // Загружаем все categoryArea связи
+    const categoryAreaRecords = await this.prisma.categoryArea.findMany({
+      where: {
+        categoryId: { in: categories.map(c => c.id) },
+        areaId: { in: areas.map(a => a.id) },
+      }
+    });
+    const categoryAreaSet = new Set(categoryAreaRecords.map(car => `${car.categoryId}::${car.areaId}`));
+  
+    // --- 2. Основной цикл валидации
     for (let i = 0; i < data.length; i++) {
       const row = data[i];
       const { section, category, area, build, gPictureLink, iconLink, buildAreaCoordinates } = row;
-
+  
       if (!build) {
-        errors.push(`Строка ${i + 2}: Не заполнено название'.`);
+        errors.push(`Строка ${i + 2}: Не заполнено название.`);
       }
-
+  
       // Проверка URL
-      if (gPictureLink != null && gPictureLink.length < 1 && !await this.isValidUrl(gPictureLink)) {
+      if (gPictureLink && gPictureLink.length > 0 && !await this.isValidUrl(gPictureLink)) {
         errors.push(`Строка ${i + 2}: некорректный URL '${gPictureLink}'.`);
       }
-      if (iconLink != null && iconLink.length < 1 && !await this.isValidUrl(iconLink)) {
+      if (iconLink && iconLink.length > 0 && !await this.isValidUrl(iconLink)) {
         errors.push(`Строка ${i + 2}: некорректный URL '${iconLink}'.`);
       }
-
-      // Проверка цепочек
-      const sectionRecord = await this.prisma.section.findFirst({ where: { title: section } });
+  
+      const sectionRecord = sectionMap.get(section);
       if (!sectionRecord) {
         errors.push(`Строка ${i + 2}: Раздел '${section}' не найден.`);
         continue;
       }
-
-      const categoryRecord = await this.prisma.category.findFirst({ where: { title: category, sectionId: sectionRecord.id } });
+  
+      const categoryKey = `${section}::${category}`;
+      const categoryRecord = categoryMap.get(categoryKey);
       if (!categoryRecord) {
-        errors.push(`Строка ${i + 2}: Категория '${category}' не найдена.`);
+        errors.push(`Строка ${i + 2}: Категория '${category}' не найдена в разделе '${section}'.`);
         continue;
       }
-
-      const areaRecord = await this.prisma.area.findFirst({ where: { name: area } });
+  
+      const areaRecord = areaMap.get(area);
       if (!areaRecord) {
         errors.push(`Строка ${i + 2}: Район '${area}' не найден.`);
         continue;
       }
-
-      const categoryAreaRecord = await this.prisma.categoryArea.findFirst({ where: { categoryId: categoryRecord.id, areaId: areaRecord.id } });
-      if (!categoryAreaRecord) {
+  
+      const catAreaKey = `${categoryRecord.id}::${areaRecord.id}`;
+      if (!categoryAreaSet.has(catAreaKey)) {
         errors.push(`Строка ${i + 2}: В категории '${category}' не найден район '${area}'.`);
         continue;
       }
-
-      //Проверка координат
-      if (buildAreaCoordinates && buildAreaCoordinates.length > 0) {
+  
+      // Проверка координат
+      if (Array.isArray(buildAreaCoordinates) && buildAreaCoordinates.length > 0) {
         for (const coord of buildAreaCoordinates) {
-          if (isNaN(coord[0]) || isNaN(coord[1])) {
-            errors.push(`Строка ${i + 2}: Некорректно заполнены координаты '${buildAreaCoordinates}'.`);
+          if (!Array.isArray(coord) || isNaN(coord[0]) || isNaN(coord[1])) {
+            errors.push(`Строка ${i + 2}: Некорректно заполнены координаты '${JSON.stringify(buildAreaCoordinates)}'.`);
           }
         }
       }
     }
-
+  
     return errors;
-  }
+  }  
 
   async isValidUrl(url: string): Promise<boolean> {
     try {
