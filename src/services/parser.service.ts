@@ -8,7 +8,7 @@ import { $Enums } from '@prisma/client';
 import fetch from 'node-fetch';
 import { FileService } from './file.service';
 
-const imageCache = new Map<string, string>();
+const imageCache = new Map<string, { buffer: Buffer, contentType: string }>();
 const updatedCategoryIcon = new Set<string>();
 
 @Injectable()
@@ -461,28 +461,40 @@ export class ParserService {
     }
   }
 
-  async downloadImageWithCache(url: string): Promise<string | null> {
-    if (!url) return null;
-    if (imageCache.has(url)) return imageCache.get(url)!;
-  
+async downloadImageWithCache(url: string): Promise<string | null> {
+  if (!url) return null;
+
+  let cached = imageCache.get(url);
+  if (!cached) {
     try {
       const response = await fetch(url);
       if (!response.ok) return null;
-  
+
       const buffer = await response.buffer();
-      const savedPicture = await this.prisma.picture.create({
-        data: {
-          picture: buffer,
-          name: url,
-          type: response.headers.get('content-type') || 'image/png',
-        },
-      });
-      imageCache.set(url, savedPicture.id);
-      return savedPicture.id;
+      const contentType = response.headers.get('content-type') || 'image/png';
+
+      cached = { buffer, contentType };
+      imageCache.set(url, cached);
     } catch {
       return null;
     }
   }
+
+  // Даже если в кэше — создаём новую запись
+  try {
+    const savedPicture = await this.prisma.picture.create({
+      data: {
+        picture: cached.buffer,
+        name: url,
+        type: cached.contentType,
+      },
+    });
+    return savedPicture.id;
+  } catch {
+    return null;
+  }
+}
+
 
   async renameAndSaveFile(sourcePath: string, destinationPath: string): Promise<void> {
     return new Promise((resolve, reject) => {
