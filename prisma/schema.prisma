@@ -115,7 +115,7 @@ model Portfolio {
   id    String     @default(uuid()) @id
   number      Int        @default(autoincrement())
   title     String? @db.VarChar(500)
-  description   String? @db.VarChar(3000)
+  description   String? @db.VarChar(10000)
   categoryName String?
   category    Category?    @relation(fields: [categoryId], references: [id])
   categoryId  String? @default(uuid())
@@ -143,9 +143,9 @@ model Category {
   id    String     @default(uuid()) @id
   number            Int           @default(autoincrement())
   title     String? @db.VarChar(500)
-  description   String? @db.VarChar(3000)
+  description   String? @db.VarChar(10000)
   seoTitle     String? @db.VarChar(500)
-  seoDescription   String? @db.VarChar(3000)
+  seoDescription   String? @db.VarChar(10000)
   subtitle     String? @db.VarChar(500)
   section    Section?    @relation(fields: [sectionId], references: [id])
   sectionId  String? @default(uuid())
@@ -188,7 +188,7 @@ model CategoryArea {
   title             String?       @db.VarChar(500)
   description       String?       @db.VarChar(3000)
   seoTitle     String? @db.VarChar(500)
-  seoDescription   String? @db.VarChar(3000)
+  seoDescription   String? @db.VarChar(10000)
   subTitle          String?       @db.VarChar(500)
   status    ContentSatus?
   picture     Picture?   @relation(fields: [pictureId], references: [id])
@@ -206,7 +206,7 @@ model Build {
   name              String?       @db.VarChar(500)
   wDescription      String?       @db.VarChar(3000)
   seoTitle     String? @db.VarChar(500)
-  seoDescription   String? @db.VarChar(3000)
+  seoDescription   String? @db.VarChar(10000)
   picture           Picture?   @relation(fields: [pictureId], references: [id])
   pictureId         String?    @default(uuid())
   gTitle            String?       @db.VarChar(500)
@@ -227,7 +227,7 @@ model Feedback {
   id    String     @default(uuid()) @id
   number      Int        @default(autoincrement())
   title     String? @db.VarChar(500)
-  description   String? @db.VarChar(3000)
+  description   String? @db.VarChar(10000)
   video    Video?    @relation(fields: [videoId], references: [id])
   videoId  String? @default(uuid())
   picture    Picture?    @relation(fields: [pictureId], references: [id])
