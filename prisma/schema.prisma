@@ -131,7 +131,7 @@ model Section {
   id                String        @default(uuid()) @id
   number            Int           @default(autoincrement())
   title             String?       @db.VarChar(500)
-  description       String?       @db.VarChar(3000)
+  description       String?       @db.VarChar(10000)
   status            ContentSatus?
   createdAt         DateTime      @default(now())
   updatedAt         DateTime      @updatedAt
@@ -186,7 +186,7 @@ model CategoryArea {
   category   Category  @relation(fields: [categoryId], references: [id])
   area      Area     @relation(fields: [areaId], references: [id])
   title             String?       @db.VarChar(500)
-  description       String?       @db.VarChar(3000)
+  description       String?       @db.VarChar(10000)
   seoTitle     String? @db.VarChar(500)
   seoDescription   String? @db.VarChar(10000)
   subTitle          String?       @db.VarChar(500)
@@ -204,7 +204,7 @@ model Build {
   number            Int           @default(autoincrement())
   coordinates       Json?
   name              String?       @db.VarChar(500)
-  wDescription      String?       @db.VarChar(3000)
+  wDescription      String?       @db.VarChar(10000)
   seoTitle     String? @db.VarChar(500)
   seoDescription   String? @db.VarChar(10000)
   picture           Picture?   @relation(fields: [pictureId], references: [id])
